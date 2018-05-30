@@ -39,11 +39,11 @@ class OneRing(object):             -----------------------------+
 
 ### Python Object Movements
 
-- `[[`  : Move to start of the *current* Python class (or previous Python class, if not currently in a class).
+- `[[`  : Move to start of the *current* Python class (or start of previous Python class if not currently in a class or already at the start of a class).
 - `]]`  : Move to start of the *next* Python class.
 - `][`  : Move to end of the *current* Python class.
 
-- `[m`  : Move to start of the *current* Python function or method (or to the start of the previous Python function or method, if already at the start of a function or method, or not currently in a function or method).
+- `[m`  : Move to start of the *current* Python function or method (or to the start of previous Python function or method if not currently in a function or method or already at the start of a function or method).
 - `]m`  : Move to start of the *next* Python function or method.
 - `]M`  : Move to end of the *current* Python function or method.
 
