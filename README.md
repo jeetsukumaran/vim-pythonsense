@@ -53,42 +53,43 @@ class OneRing(object):             -----------------------------+
 
 ## Customization
 
-If you are unhappy with the default key-mappings you can provide your own by
-defining custom mappings in your _`.vimrc`_. For example to replicate the
-default mappings, you would define the following:
+If you are unhappy with the default key-mappings you define your own which will individually override the default ones.
+For example, to replicate the default mappings you would define the following in your "~/.vimrc":
 
 ```
+map ac <Plug>(PythonsenseOuterClassTextObject)
+map ic <Plug>(PythonsenseInnerClassTextObject)
+map af <Plug>(PythonsenseOuterFunctionTextObject)
+map id <Plug>(PythonsenseInnerFunctionTextObject)
+map ad <Plug>(PythonsenseOuterDocStringTextObject)
+map id <Plug>(PythonsenseInnerDocStringTextObject)
 
-    map ac <Plug>(PythonsenseOuterClassTextObject)
-    map ic <Plug>(PythonsenseInnerClassTextObject)
-    map af <Plug>(PythonsenseOuterFunctionTextObject)
-    map id <Plug>(PythonsenseInnerFunctionTextObject)
-    map ad <Plug>(PythonsenseOuterDocStringTextObject)
-    map id <Plug>(PythonsenseInnerDocStringTextObject)
+map [[ <Plug>(PythonsenseStartOfPythonClass)
+map ]] <Plug>(PythonsenseStartOfNextPythonClass)
+map ][ <Plug>(PythonsenseEndOfPythonClass)
+map [m <Plug>(PythonsenseStartOfPythonFunction)
+map ]m <Plug>(PythonsenseStartOfNextPythonFunction)
+map ]M <Plug>(PythonsenseEndOfPythonFunction)
 
-    map [[ <Plug>(PythonsenseStartOfPythonClass)
-    map ]] <Plug>(PythonsenseStartOfNextPythonClass)
-    map ][ <Plug>(PythonsenseEndOfPythonClass)
-    map [m <Plug>(PythonsenseStartOfPythonFunction)
-    map ]m <Plug>(PythonsenseStartOfNextPythonFunction)
-    map ]M <Plug>(PythonsenseEndOfPythonFunction)
-
-    map g: <Plug>(PythonsensePyWhere)
+map g: <Plug>(PythonsensePyWhere)
 ```
 
-You can suppress all key mappings by specifying the following in your "~/.vimrc":
-
-```
-let g:is_pythonsense_suppress_keymaps = 1
-```
-
-Alternatively, you can selectively suppress just the text object, motion, or information key mapping sets by respectively specifying one or more of the following in your "~/.vimrc":
+If you want to suppress some of the key mappings entirely (i.e., without providing your own to override the functionality), you can specify one or more of the following:
 
 ```
 let g:is_pythonsense_suppress_object_keymaps = 1
 let g:is_pythonsense_suppress_motion_keymaps = 1
 let g:is_pythonsense_suppress_location_keymaps = 1
 ```
+
+to selectively suppress just the text object, motion, or information key mapping sets by respectively.
+You can als suppress all key mappings by specifying the following in your "~/.vimrc":
+
+```
+let g:is_pythonsense_suppress_keymaps = 1
+```
+
+Note that if you just want to customize one or more of the existing mappings (without actually suppressing any functionality), you do not need to suppress any key mappings: simply provide your own key mapping to each of the "``<Plug>``" mappings you want to override, and any that are not so explicitly specified will be assigned to the default key maps.
 
 ## Installation
 
@@ -130,7 +131,7 @@ or run:
 ## Similar Projects
 
 Most notable is the [vim-textobj-python](https://github.com/bps/vim-textobj-python) plugin.
-Pythonsense distinguishes itself from the this plugin in the following ways:
+Pythonsense distinguishes itself from this plugin in the following ways:
 
 -   Stand-alone and lightweight: does not rely on [vim-textobj-user](https://github.com/kana/vim-textobj-user/wiki).
 -   Also includes a docstring text object (originally from [here](https://pastebin.com/u/gfixler)).
