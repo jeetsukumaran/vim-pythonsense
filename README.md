@@ -85,6 +85,8 @@ and run:
 
     :PlugInstall
 
+More information on setting up [Vim-Plug](https://github.com/junegunn/vim-plug) to manage your plugins can be found [here](https://github.com/junegunn/vim-plug/wiki/tutorial).
+
 ### [Vundle](https://github.com/gmarik/vundle.git)
 
 Add the line below into your _.vimrc_ :
