@@ -6,12 +6,12 @@
 
 ### Python Text Objects
 
--   "`ac`"    : "outer class" text object: includes the entire class, including the header (class name declaration) and decorators, the class body, as well as a blank line if this is given after the class definition.
--   "`ic`"    : "inner class" text object: the class body *only*, thus excluding the class name declaration line and any blank lines after the class definition.
--   "`af`"    : "outer function" text object: includes the entire function, including the header (function name declaration) and decorators, the function body, as well as a blank line if this is given after the function definition.
--   "`if`"    : "inner function" text object: the function body *only*, thus excluding the function name declaration line and any blank lines after the function definition.
--   "`ad`"    : "outer docstring" text object.
--   "`id`"    : "inner docstring" text object.
+-   "`ac`"    : Outer class text object. This includes the entire class, including the header (class name declaration) and decorators, the class body, as well as a blank line if this is given after the class definition.
+-   "`ic`"    : Inner class text object. This is the class body *only*, thus excluding the class name declaration line and any blank lines after the class definition.
+-   "`af`"    : Outer function text object. This includes the entire function, including the header (function name declaration) and decorators, the function body, as well as a blank line if this is given after the function definition.
+-   "`if`"    : Inner function text object. This is the function body *only*, thus excluding the function name declaration line and any blank lines after the function definition.
+-   "`ad`"    : Outer docstring text object.
+-   "`id`"    : Inner docstring text object.
 
 The differences between inner and outer class and method/function text objects are illustrated by the following:
 
