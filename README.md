@@ -39,13 +39,13 @@ class OneRing(object):             -----------------------------+
 
 ### Python Object Movements
 
-- `[c`  : Move to start of the *current* Python class (or previous Python class, if not currently in a class).
-- `]c`  : Move to start of the *next* Python class.
-- `]C`  : Move to end of the *current* Python class.
+- `[[`  : Move to start of the *current* Python class (or previous Python class, if not currently in a class).
+- `]]`  : Move to start of the *next* Python class.
+- `][`  : Move to end of the *current* Python class.
 
-- `[f`  : Move to start of the *current* Python function or method (or previous Python function or method, if not currently in a function or method).
-- `]f`  : Move to start of the *next* Python function or method.
-- `]F`  : Move to end of the *current* Python function or method.
+- `[m`  : Move to start of the *current* Python function or method (or previous Python function or method, if not currently in a function or method).
+- `]m`  : Move to start of the *next* Python function or method.
+- `]M`  : Move to end of the *current* Python function or method.
 
 ### Python Location Information
 
@@ -66,12 +66,12 @@ default mappings, you would define the following:
     map ad <Plug>(PythonsenseOuterDocStringTextObject)
     map id <Plug>(PythonsenseInnerDocStringTextObject)
 
-    map [c <Plug>(PythonsenseStartOfPythonClass)
-    map ]c <Plug>(PythonsenseStartOfNextPythonClass)
-    map ]C <Plug>(PythonsenseEndOfPythonClass)
-    map [f <Plug>(PythonsenseStartOfPythonFunction)
-    map ]f <Plug>(PythonsenseStartOfNextPythonFunction)
-    map ]F <Plug>(PythonsenseEndOfPythonFunction)
+    map [[ <Plug>(PythonsenseStartOfPythonClass)
+    map ]] <Plug>(PythonsenseStartOfNextPythonClass)
+    map ][ <Plug>(PythonsenseEndOfPythonClass)
+    map [m <Plug>(PythonsenseStartOfPythonFunction)
+    map ]m <Plug>(PythonsenseStartOfNextPythonFunction)
+    map ]M <Plug>(PythonsenseEndOfPythonFunction)
 
     map g: <Plug>(PythonsensePyWhere)
 ```

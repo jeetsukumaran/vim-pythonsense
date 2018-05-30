@@ -78,7 +78,7 @@ onoremap <buffer> <silent> <Plug>(PythonsenseEndOfPythonFunction) V:<C-u>call py
 
 nnoremap <buffer> <silent> <Plug>(PythonsensePyWhere) :Pywhere<CR>
 
-if ! get(g:, "pythonsense_suppress_keymaps", 0)
+if ! get(g:, "is_pythonsense_suppress_keymaps", 0) && ! get(g:, "is_pythonsense_suppress_object_keymaps", 0)
 
     if !hasmapto('<Plug>PythonsenseOuterClassTextObject')
         vmap ac <Plug>(PythonsenseOuterClassTextObject)
@@ -112,36 +112,12 @@ if ! get(g:, "pythonsense_suppress_keymaps", 0)
         vmap id <Plug>(PythonsenseInnerDocStringTextObject)
         sunmap id
     endif
+endif
 
-    if !hasmapto('<Plug>PythonsenseStartOfPythonClass')
-        map [c <Plug>(PythonsenseStartOfPythonClass)
-        sunmap [c
-    endif
-    if !hasmapto('<Plug>PythonsenseStartOfNextPythonClass')
-        map ]c <Plug>(PythonsenseStartOfNextPythonClass)
-        sunmap ]c
-    endif
-    if !hasmapto('<Plug>PythonsenseEndOfPythonClass')
-        map ]C <Plug>(PythonsenseEndOfPythonClass)
-        sunmap ]C
-    endif
-
-    if !hasmapto('<Plug>PythonsenseStartOfPythonFunction')
-        map [f <Plug>(PythonsenseStartOfPythonFunction)
-        sunmap [f
-    endif
-    if !hasmapto('<Plug>PythonsenseStartOfNextPythonFunction')
-        map ]f <Plug>(PythonsenseStartOfNextPythonFunction)
-        sunmap ]f
-    endif
-    if !hasmapto('<Plug>PythonsenseEndOfPythonFunction')
-        map ]F <Plug>(PythonsenseEndOfPythonFunction)
-        sunmap ]F
-    endif
+if ! get(g:, "is_pythonsense_suppress_keymaps", 0) && ! get(g:, "is_pythonsense_suppress_location_keymaps", 0)
 
     if !hasmapto('<Plug>(PythonsensePyWhere)')
         map g: <Plug>(PythonsensePyWhere)
-        sunmap g:
     endif
 
 endif
