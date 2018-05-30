@@ -509,7 +509,7 @@ function! pythonsense#echo_python_location()
             let obj_name = matchstr(current_line_text, '^\s*\(class\|def\)\s\+\zs\k\+')
             if get(g:, "pythonsense_extended_location_info", 1)
                 let obj_type = matchstr(current_line_text, '^\s*\zs\(class\|def\)')
-                call add(pyloc, "(" . obj_type . ") " . obj_name)
+                call add(pyloc, "(" . obj_type . ":)" . obj_name)
             else
                 call add(pyloc, obj_name)
             endif

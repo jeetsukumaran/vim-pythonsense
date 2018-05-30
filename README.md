@@ -49,7 +49,7 @@ class OneRing(object):             -----------------------------+
 
 ### Python Location Information
 
-- `g:` : print (echo) current semantic location (e.g. ``(class) Foo > (def) bar``)
+- `g:` : print (echo) current semantic location (e.g. ``(class:)Foo > (def:)bar``)
 
 ## Customization
 
