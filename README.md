@@ -51,6 +51,50 @@ class OneRing(object):             -----------------------------+
 
 - "`g:`" : print (echo) current semantic location (e.g. ""``(class:)Foo > (def:)bar"``")
 
+## Installation
+
+### Manually (Example)
+
+If you are using Vim 8.0 and above, I recommend you take advantage of the '[package](https://vi.stackexchange.com/a/9523/17621)' feature and do something like this:
+
+    $ cd ~/.vim
+    $ mkdir -p pack/import/start
+    $ cd pack/import/start && git clone git://github.com/jeetsukumaran/vim-pythonsense.git
+
+You do not have to name the mid-level directory "import"; it can be anything else that makes sense to you for this plugin (e.g., "bundle", "jeetsukumaran", "python", etc.). For more information, see the documentation on "[packages](http://vimhelp.appspot.com/repeat.txt.html#packages)".
+
+If you are using an older Vim version and do not want to upgrade, then you would be much, much, *much* better served by using a plugin manager like [Vim-Plug](https://github.com/junegunn/vim-plug) (described below).
+However, if you are stuck with an old version of Vim and *really* do not or cannot use a plugin manager, then will need to manually copy the files to the corresponding locations in your home directory:
+
+-   "vim-pythonsense/after/ftplugin/python/pythonsense.vim" to: "~/.vim/after/ftplugin/python/pythonsense.vim"
+-   "vim-pythonsense/autoload/pythonsense.vim" to: "~/.vim/autoload/pythonsense.vim"
+-   "vim-pythonsense/ftplugin/python/pythonsense.vim" to: "~/.vim/ftplugin/python/pythonsense.vim"
+
+### [pathogen.vim](https://github.com/tpope/vim-pathogen)
+
+    $ cd ~/.vim/bundle
+    $ git clone git://github.com/jeetsukumaran/vim-pythonsense.git
+
+### [Vim-Plug](https://github.com/junegunn/vim-plug)
+
+Add the line below into your _.vimrc_ :
+
+    Plug 'jeetsukumaran/vim-pythonsense'
+
+and run:
+
+    :PlugInstall
+
+### [Vundle](https://github.com/gmarik/vundle.git)
+
+Add the line below into your _.vimrc_ :
+
+    Vundle 'jeetsukumaran/vim-pythonsense'
+
+or run:
+
+    :VundleInstall jeetsukumaran/vim-pythonsense
+
 ## Customization
 
 If you are unhappy with the default key-mappings you define your own which will individually override the default ones.
@@ -98,43 +142,6 @@ map [f <Plug>(PythonsenseStartOfPythonFunction)
 map ]f <Plug>(PythonsenseStartOfNextPythonFunction)
 map ]F <Plug>(PythonsenseEndOfPythonFunction)
 ```
-## Installation
-
-### Manually (Example)
-
-If you are using Vim 8.0 and above, I recommend you take advantage of the '[package](https://vi.stackexchange.com/a/9523/17621)' feature and do something like this:
-
-    $ cd ~/.vim
-    $ mkdir -p pack/import/start
-    $ cd pack/import/start && git clone git://github.com/jeetsukumaran/vim-pythonsense.git
-
-You do not have to name the mid-level directory "import"; it can be anything else that makes sense to you for this plugin (e.g., "bundle", "jeetsukumaran", "python", etc.). For more information, see the documentation on "[packages](http://vimhelp.appspot.com/repeat.txt.html#packages)".
-
-### [pathogen.vim](https://github.com/tpope/vim-pathogen)
-
-    $ cd ~/.vim/bundle
-    $ git clone git://github.com/jeetsukumaran/vim-pythonsense.git
-
-### [Vim-Plug](https://github.com/junegunn/vim-plug)
-
-Add the line below into your _.vimrc_ :
-
-    Plug 'jeetsukumaran/vim-pythonsense'
-
-and run:
-
-    :PlugInstall
-
-### [Vundle](https://github.com/gmarik/vundle.git)
-
-Add the line below into your _.vimrc_ :
-
-    Vundle 'jeetsukumaran/vim-pythonsense'
-
-or run:
-
-    :VundleInstall jeetsukumaran/vim-pythonsense
-
 ## Similar Projects
 
 Most notable is the [vim-textobj-python](https://github.com/bps/vim-textobj-python) plugin.
