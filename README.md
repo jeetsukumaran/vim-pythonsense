@@ -76,6 +76,20 @@ default mappings, you would define the following:
     map g: <Plug>(PythonsensePyWhere)
 ```
 
+You can suppress all key mappings by specifying the following in your "~/.vimrc":
+
+```
+let g:is_pythonsense_suppress_keymaps = 1
+```
+
+Alternatively, you can selectively suppress just the text object, motion, or information key mapping sets by respectively specifying one or more of the following in your "~/.vimrc":
+
+```
+let g:is_pythonsense_suppress_object_keymaps = 1
+let g:is_pythonsense_suppress_motion_keymaps = 1
+let g:is_pythonsense_suppress_location_keymaps = 1
+```
+
 ## Installation
 
 ### Manually (Example)
