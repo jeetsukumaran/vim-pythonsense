@@ -2,7 +2,7 @@
 
 ## Description
 
-`Pythonsense` is a Vim plugin that provides text objects and motions for Python classes, methods, functions, and doc strings.
+`Pythonsense` is a Vim plugin that provides [text objects](http://vimdoc.sourceforge.net/htmldoc/motion.html#object-select) and [motions](http://vimdoc.sourceforge.net/htmldoc/motion.html#object-motions) for Python classes, methods, functions, and doc strings.
 
 ### Python Text Objects
 
@@ -43,7 +43,7 @@ class OneRing(object):             -----------------------------+
 - "`]]`"  : Move to start of the *next* Python class.
 - "`][`"  : Move to end of the *current* Python class.
 
-- "`[m`"  : Move to start of the *current* Python function or method (or to the start of previous Python function or method if not currently in a function or method or already at the start of a function or method).
+- "`[m`"  : Move to start of the *current* Python function or method (or to the start of previous function or method if not currently in a function or method or already at the start of a function or method).
 - "`]m`"  : Move to start of the *next* Python function or method.
 - "`]M`"  : Move to end of the *current* Python function or method.
 
@@ -144,6 +144,7 @@ map [f <Plug>(PythonsenseStartOfPythonFunction)
 map ]f <Plug>(PythonsenseStartOfNextPythonFunction)
 map ]F <Plug>(PythonsenseEndOfPythonFunction)
 ```
+
 ## Similar Projects
 
 Most notable is the [vim-textobj-python](https://github.com/bps/vim-textobj-python) plugin.
@@ -157,6 +158,14 @@ Pythonsense distinguishes itself from this plugin in the following ways:
 -   Seems to handle functions/classes with multiline arguments better.
 -   Handles folds better (opens them automatically if needed).
 -   Of course, also provides a docstring text object as well as the semantic location information helper ("``g:``").
+
+## More Information on Text Objects
+
+If you are reading all this and wondering what is a text object or why are text objects such a big deal, then the short answer is that text objects are like using a socket and rachet as opposed to a monkey wrench: as long as you can find a fit, you cannot beat the efficiency, speed, and precision (as well as elegance and pure pleasure). For more details, you could look at some of the following:
+
+-   https://blog.carbonfive.com/2011/10/17/vim-text-objects-the-definitive-guide/
+-   http://owen.cymru/vim-text-objects-extend-vims-natural-language-2/
+-   http://codyveal.com/posts/vim-killer-features-part-1-text-objects/
 
 ## Acknowledgements
 
