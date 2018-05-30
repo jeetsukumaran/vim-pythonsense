@@ -37,7 +37,7 @@ class OneRing(object):             -----------------------------+
                                    -----------------------------+
 ```
 
-### Python Object Movements
+### Python Object Motions
 
 - "`[[`"  : Move to start of the *current* Python class (or start of previous Python class if not currently in a class or already at the start of a class).
 - "`]]`"  : Move to start of the *next* Python class.
