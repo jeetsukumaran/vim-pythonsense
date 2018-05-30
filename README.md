@@ -90,7 +90,7 @@ You can also suppress *all* default key mappings by specifying the following in 
 let g:is_pythonsense_suppress_keymaps = 1
 ```
 
-Note that if you just want to customize a few of the existing mappings (while keeping all the others), you do not need to suppress any key mappings: simply provide your own key mapping to each of the "``<Plug>``" mappings you want to override, and these will be respected, while any "``<Plug>`` maps that are not so explicitly bound will be assigned to the default key maps.
+Note that if you just want to customize a few of the existing mappings (while keeping all the others), you do not need to suppress any key mappings: simply provide your own key mapping to each of the "``<Plug>``" mappings you want to override, and these will be respected, while any "``<Plug>``" maps that are not so explicitly bound will be assigned to the default key maps.
 
 ## Installation
 
