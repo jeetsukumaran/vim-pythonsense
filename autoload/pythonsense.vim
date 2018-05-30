@@ -62,7 +62,7 @@ endfunction
 "   Select an object ("class"/"function")
 let s:pythonsense_obj_start_line = -1
 let s:pythonsense_obj_end_line = -1
-function! pythonsense#select_named_object(obj_name, inner, range, count)
+function! pythonsense#select_named_object(obj_name, inner, range)
 
 	" Is this a new selection?
 	let new_vis = 0
@@ -74,50 +74,49 @@ function! pythonsense#select_named_object(obj_name, inner, range, count)
 	let s:pythonsense_obj_end_line = a:range[1]
 
 	" Repeatedly increase the scope of the selection.
-	let itr_cnt = 0
-	let cnt = a:count
-	let scan_start_line = s:pythonsense_obj_start_line
-	while scan_start_line > 0
+    let cnt = 1
+    let scan_start_line = s:pythonsense_obj_start_line
+    while scan_start_line > 0
         if getline(scan_start_line) !~ '^\s*$'
             break
         endif
         let scan_start_line -= 1
     endwhile
     if scan_start_line == 0
-        return
+        return 0
     endif
-	let obj_max_indent_level = -1
-	while cnt > 0
+    let obj_max_indent_level = -1
+    while cnt > 0
         let current_line_nr = scan_start_line
 
         let [obj_start_line, obj_end_line] = pythonsense#get_object_line_range(a:obj_name, obj_max_indent_level, current_line_nr, s:pythonsense_obj_end_line, a:inner)
         if obj_start_line == -1
-            return
+            return 0
         endif
 
-		let is_changed = 0
-		let is_changed = is_changed || s:pythonsense_obj_start_line != obj_start_line
-		let is_changed = is_changed || s:pythonsense_obj_end_line != obj_end_line
-		if new_vis
-			let is_changed = 1
-		endif
+        let is_changed = 0
+        let is_changed = is_changed || s:pythonsense_obj_start_line != obj_start_line
+        let is_changed = is_changed || s:pythonsense_obj_end_line != obj_end_line
+        if new_vis
+            let is_changed = 1
+        endif
 
-		let s:pythonsense_obj_start_line = obj_start_line
-		let s:pythonsense_obj_end_line = obj_end_line
+        let s:pythonsense_obj_start_line = obj_start_line
+        let s:pythonsense_obj_end_line = obj_end_line
 
-		" If there was no change, then don't decrement the count (it didn't
-		" count because it didn't do anything).
-		if is_changed
-		    let cnt = cnt - 1
-		else
+        " If there was no change, then don't decrement the count (it didn't
+        " count because it didn't do anything).
+        if is_changed
+            let cnt = cnt - 1
+        else
             " no change to selection;
             " move to line above selection and try again
-		    if scan_start_line == 0
-		        return
+            if scan_start_line == 0
+                return 0
             endif
             let [min_indent, max_indent] = pythonsense#get_minmax_indent_count('\(class\|def\)', scan_start_line, obj_end_line)
             if min_indent == 0
-                return
+                return 0
             endif
             let obj_max_indent_level = min_indent - 1
             let scan_start_line -= 1
@@ -138,21 +137,7 @@ function! pythonsense#select_named_object(obj_name, inner, range, count)
     else
         execute "normal VG"
     endif
-    " move to beginning of range
-    if get(g:, "pythonsense_move_to_top_of_selection", 1)
-        normal! o
-    endif
-
-	" Update these static variables - we need to keep these up-to-date between
-	" invocations because it's the only way we can detect whether it's a new
-	" visual mode. We need to know if it's a new visual mode because otherwise
-	" if there's a single line block in visual line mode and we select it with
-	" "V", we can't tell whether it's already been selected using Vii.
-	exe "normal! \<Esc>"
-	let s:l0 = line("'<")
-	let s:l1 = line("'>")
-	normal gv
-
+    return 1
 endfunction
 
 function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line_range_start, line_range_end, inner)
@@ -364,12 +349,45 @@ function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_inden
     return 0
 endfunction
 
-function! pythonsense#python_function_text_object(inner, range)
-    call pythonsense#select_named_object('def', a:inner, a:range, 1)
+function! pythonsense#python_text_object(obj_name, inner, mode)
+    if a:mode == "o"
+        let range = [line("."), line(".")]
+    else
+	    exe "normal! \<Esc>"
+        let range = [line("'<"), line("'>")]
+	    normal! gv
+    endif
+    let nreps_left = v:count1
+    while nreps_left > 0
+        let is_set = pythonsense#select_named_object(a:obj_name, a:inner, range)
+        if !is_set
+            break
+        endif
+	    exe "normal! \<Esc>"
+	    if nreps_left > 1
+            let range = [line("'<"), line("'>")]
+        else
+            " Update these static variables - we need to keep these up-to-date
+            " between invocations because it's the only way we can detect
+            " whether it's a new visual mode. We need to know if it's a new
+            " visual mode because otherwise if there's a single line block in
+            " visual line mode and we select it with "V", we can't tell
+            " whether it's already been selected using Vii.
+            let s:pythonsense_obj_start_line = line("'<")
+            let s:pythonsense_obj_end_line = line("'>")
+        endif
+	    normal! gv
+        let nreps_left -= 1
+    endwhile
+	exec "normal! \<ESC>gv"
 endfunction
 
-function! pythonsense#python_class_text_object(inner, range)
-    call pythonsense#select_named_object('class', a:inner, a:range, 1)
+function! pythonsense#python_function_text_object(inner, mode)
+    call pythonsense#python_text_object('def', a:inner, a:mode)
+endfunction
+
+function! pythonsense#python_class_text_object(inner, mode)
+    call pythonsense#python_text_object('class', a:inner, a:mode)
 endfunction
 
 " }}}1
