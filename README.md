@@ -6,12 +6,12 @@
 
 ### Python Text Objects
 
--   `ac`    : "outer class" text object: includes the entire class, including the header (class name declaration) and decorators, the class body, as well as a blank line if this is given after the class definition.
--   `ic`    : "inner class" text object: the class body *only*, thus excluding the class name declaration line and any blank lines after the class definition.
--   `af`    : "outer function" text object: includes the entire function, including the header (function name declaration) and decorators, the function body, as well as a blank line if this is given after the function definition.
--   `if`    : "inner function" text object: the function body *only*, thus excluding the function name declaration line and any blank lines after the function definition.
--   `ad`    : "outer docstring" text object.
--   `id`    : "inner docstring" text object.
+-   "`ac`"    : "outer class" text object: includes the entire class, including the header (class name declaration) and decorators, the class body, as well as a blank line if this is given after the class definition.
+-   "`ic`"    : "inner class" text object: the class body *only*, thus excluding the class name declaration line and any blank lines after the class definition.
+-   "`af`"    : "outer function" text object: includes the entire function, including the header (function name declaration) and decorators, the function body, as well as a blank line if this is given after the function definition.
+-   "`if`"    : "inner function" text object: the function body *only*, thus excluding the function name declaration line and any blank lines after the function definition.
+-   "`ad`"    : "outer docstring" text object.
+-   "`id`"    : "inner docstring" text object.
 
 The differences between inner and outer class and method/function text objects are illustrated by the following:
 
@@ -39,17 +39,17 @@ class OneRing(object):             -----------------------------+
 
 ### Python Object Movements
 
-- `[[`  : Move to start of the *current* Python class (or start of previous Python class if not currently in a class or already at the start of a class).
-- `]]`  : Move to start of the *next* Python class.
-- `][`  : Move to end of the *current* Python class.
+- "`[[`"  : Move to start of the *current* Python class (or start of previous Python class if not currently in a class or already at the start of a class).
+- "`]]`"  : Move to start of the *next* Python class.
+- "`][`"  : Move to end of the *current* Python class.
 
-- `[m`  : Move to start of the *current* Python function or method (or to the start of previous Python function or method if not currently in a function or method or already at the start of a function or method).
-- `]m`  : Move to start of the *next* Python function or method.
-- `]M`  : Move to end of the *current* Python function or method.
+- "`[m`"  : Move to start of the *current* Python function or method (or to the start of previous Python function or method if not currently in a function or method or already at the start of a function or method).
+- "`]m`"  : Move to start of the *next* Python function or method.
+- "`]M`"  : Move to end of the *current* Python function or method.
 
 ### Python Location Information
 
-- `g:` : print (echo) current semantic location (e.g. "``(class:)Foo > (def:)bar``")
+- "`g:`" : print (echo) current semantic location (e.g. ""``(class:)Foo > (def:)bar"``")
 
 ## Customization
 
