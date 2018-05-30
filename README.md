@@ -66,12 +66,12 @@ default mappings, you would define the following:
     map ad <Plug>(PythonsenseOuterDocStringTextObject)
     map id <Plug>(PythonsenseInnerDocStringTextObject)
 
-    map [c <Plug>(PythonsenseStartOfPreviousPythonClass)
+    map [c <Plug>(PythonsenseStartOfPythonClass)
     map ]c <Plug>(PythonsenseStartOfNextPythonClass)
-    map ]C <Plug>(PythonsenseEndOfCurrentPythonClass)
-    map [f <Plug>(PythonsenseStartOfPreviousPythonFunction)
+    map ]C <Plug>(PythonsenseEndOfPythonClass)
+    map [f <Plug>(PythonsenseStartOfPythonFunction)
     map ]f <Plug>(PythonsenseStartOfNextPythonFunction)
-    map ]F <Plug>(PythonsenseEndOfCurrentPythonFunction)
+    map ]F <Plug>(PythonsenseEndOfPythonFunction)
 
     map g: <Plug>(PythonsensePyWhere)
 ```

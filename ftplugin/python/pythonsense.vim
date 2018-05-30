@@ -52,29 +52,29 @@ vnoremap <buffer> <silent> <Plug>(PythonsenseInnerClassTextObject) :<C-u>call py
 vnoremap <buffer> <silent> <Plug>(PythonsenseOuterDocStringTextObject) :<C-u>cal pythonsense#python_docstring_text_object(0)<CR>
 vnoremap <buffer> <silent> <Plug>(PythonsenseInnerDocStringTextObject) :<C-u>cal pythonsense#python_docstring_text_object(1)<CR>
 
-nnoremap <buffer> <silent> <Plug>(PythonsenseStartOfPreviousPythonClass) :<C-u>call pythonsense#move_to_python_object("class", 0, 0, "n")<CR>
-vnoremap <buffer> <silent> <Plug>(PythonsenseStartOfPreviousPythonClass) :call pythonsense#move_to_python_object("class", 0, 0, "v")<CR>
-onoremap <buffer> <silent> <Plug>(PythonsenseStartOfPreviousPythonClass) V:<C-u>call pythonsense#move_to_python_object("class", 0, 0, "o")<CR>
+nnoremap <buffer> <silent> <Plug>(PythonsenseStartOfPythonClass) :<C-u>call pythonsense#move_to_python_object("class", 0, 0, "n")<CR>
+vnoremap <buffer> <silent> <Plug>(PythonsenseStartOfPythonClass) :call pythonsense#move_to_python_object("class", 0, 0, "v")<CR>
+onoremap <buffer> <silent> <Plug>(PythonsenseStartOfPythonClass) V:<C-u>call pythonsense#move_to_python_object("class", 0, 0, "o")<CR>
 
 nnoremap <buffer> <silent> <Plug>(PythonsenseStartOfNextPythonClass) :<C-u>call pythonsense#move_to_python_object("class", 0, 1, "n")<CR>
 vnoremap <buffer> <silent> <Plug>(PythonsenseStartOfNextPythonClass) :call pythonsense#move_to_python_object("class", 0, 1, "v")<CR>
 onoremap <buffer> <silent> <Plug>(PythonsenseStartOfNextPythonClass) V:<C-u>call pythonsense#move_to_python_object("class", 0, 1, "o")<CR>
 
-nnoremap <buffer> <silent> <Plug>(PythonsenseEndOfCurrentPythonClass) :<C-u>call pythonsense#move_to_python_object("class", 1, 1, "n")<CR>
-vnoremap <buffer> <silent> <Plug>(PythonsenseEndOfCurrentPythonClass) :call pythonsense#move_to_python_object("class", 1, 1, "v")<CR>
-onoremap <buffer> <silent> <Plug>(PythonsenseEndOfCurrentPythonClass) V:<C-u>call pythonsense#move_to_python_object("class", 1, 1, "o")<CR>
+nnoremap <buffer> <silent> <Plug>(PythonsenseEndOfPythonClass) :<C-u>call pythonsense#move_to_python_object("class", 1, 1, "n")<CR>
+vnoremap <buffer> <silent> <Plug>(PythonsenseEndOfPythonClass) :call pythonsense#move_to_python_object("class", 1, 1, "v")<CR>
+onoremap <buffer> <silent> <Plug>(PythonsenseEndOfPythonClass) V:<C-u>call pythonsense#move_to_python_object("class", 1, 1, "o")<CR>
 
-nnoremap <buffer> <silent> <Plug>(PythonsenseStartOfPreviousPythonFunction) :<C-u>call pythonsense#move_to_python_object("def", 0, 0, "n")<CR>
-vnoremap <buffer> <silent> <Plug>(PythonsenseStartOfPreviousPythonFunction) :call pythonsense#move_to_python_object("def", 0, 0, "v")<CR>
-onoremap <buffer> <silent> <Plug>(PythonsenseStartOfPreviousPythonFunction) V:<C-u>call pythonsense#move_to_python_object("def", 0, 0, "o")<CR>
+nnoremap <buffer> <silent> <Plug>(PythonsenseStartOfPythonFunction) :<C-u>call pythonsense#move_to_python_object("def", 0, 0, "n")<CR>
+vnoremap <buffer> <silent> <Plug>(PythonsenseStartOfPythonFunction) :call pythonsense#move_to_python_object("def", 0, 0, "v")<CR>
+onoremap <buffer> <silent> <Plug>(PythonsenseStartOfPythonFunction) V:<C-u>call pythonsense#move_to_python_object("def", 0, 0, "o")<CR>
 
 nnoremap <buffer> <silent> <Plug>(PythonsenseStartOfNextPythonFunction) :<C-u>call pythonsense#move_to_python_object("def", 0, 1, "n")<CR>
 vnoremap <buffer> <silent> <Plug>(PythonsenseStartOfNextPythonFunction) :call pythonsense#move_to_python_object("def", 0, 1, "v")<CR>
 onoremap <buffer> <silent> <Plug>(PythonsenseStartOfNextPythonFunction) V:<C-u>call pythonsense#move_to_python_object("def", 0, 1, "o")<CR>
 
-nnoremap <buffer> <silent> <Plug>(PythonsenseEndOfCurrentPythonFunction) :<C-u>call pythonsense#move_to_python_object("def", 1, 1, "n")<CR>
-vnoremap <buffer> <silent> <Plug>(PythonsenseEndOfCurrentPythonFunction) :call pythonsense#move_to_python_object("def", 1, 1, "v")<CR>
-onoremap <buffer> <silent> <Plug>(PythonsenseEndOfCurrentPythonFunction) V:<C-u>call pythonsense#move_to_python_object("def", 1, 1, "o")<CR>
+nnoremap <buffer> <silent> <Plug>(PythonsenseEndOfPythonFunction) :<C-u>call pythonsense#move_to_python_object("def", 1, 1, "n")<CR>
+vnoremap <buffer> <silent> <Plug>(PythonsenseEndOfPythonFunction) :call pythonsense#move_to_python_object("def", 1, 1, "v")<CR>
+onoremap <buffer> <silent> <Plug>(PythonsenseEndOfPythonFunction) V:<C-u>call pythonsense#move_to_python_object("def", 1, 1, "o")<CR>
 
 nnoremap <buffer> <silent> <Plug>(PythonsensePyWhere) :Pywhere<CR>
 
@@ -113,29 +113,29 @@ if ! get(g:, "pythonsense_suppress_keymaps", 0)
         sunmap id
     endif
 
-    if !hasmapto('<Plug>PythonsenseStartOfPreviousPythonClass')
-        map [c <Plug>(PythonsenseStartOfPreviousPythonClass)
+    if !hasmapto('<Plug>PythonsenseStartOfPythonClass')
+        map [c <Plug>(PythonsenseStartOfPythonClass)
         sunmap [c
     endif
     if !hasmapto('<Plug>PythonsenseStartOfNextPythonClass')
         map ]c <Plug>(PythonsenseStartOfNextPythonClass)
         sunmap ]c
     endif
-    if !hasmapto('<Plug>PythonsenseEndOfCurrentPythonClass')
-        map ]C <Plug>(PythonsenseEndOfCurrentPythonClass)
+    if !hasmapto('<Plug>PythonsenseEndOfPythonClass')
+        map ]C <Plug>(PythonsenseEndOfPythonClass)
         sunmap ]C
     endif
 
-    if !hasmapto('<Plug>PythonsenseStartOfPreviousPythonFunction')
-        map [f <Plug>(PythonsenseStartOfPreviousPythonFunction)
+    if !hasmapto('<Plug>PythonsenseStartOfPythonFunction')
+        map [f <Plug>(PythonsenseStartOfPythonFunction)
         sunmap [f
     endif
     if !hasmapto('<Plug>PythonsenseStartOfNextPythonFunction')
         map ]f <Plug>(PythonsenseStartOfNextPythonFunction)
         sunmap ]f
     endif
-    if !hasmapto('<Plug>PythonsenseEndOfCurrentPythonFunction')
-        map ]F <Plug>(PythonsenseEndOfCurrentPythonFunction)
+    if !hasmapto('<Plug>PythonsenseEndOfPythonFunction')
+        map ]F <Plug>(PythonsenseEndOfPythonFunction)
         sunmap ]F
     endif
 
