@@ -161,7 +161,7 @@ Pythonsense distinguishes itself from this plugin in the following ways:
 
 ## More Information on Text Objects
 
-If you are reading all this and wondering what is a text object or why are text objects such a big deal, then the short answer is that text objects are like using a socket and rachet as opposed to a monkey wrench: as long as you can find a fit, you cannot beat the efficiency, speed, and precision (as well as elegance and pure pleasure). For more details, you could look at some of the following:
+If you are reading all this and wondering what is a text object or why are text objects such a big deal, then the short answer is that text objects are like using a socket and ratchet as opposed to a monkey wrench: as long as you can find a fit, you cannot beat the efficiency, speed, and precision (as well as elegance and pure pleasure). For more details, you could look at some of the following:
 
 -   https://blog.carbonfive.com/2011/10/17/vim-text-objects-the-definitive-guide/
 -   http://owen.cymru/vim-text-objects-extend-vims-natural-language-2/
