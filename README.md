@@ -91,7 +91,13 @@ let g:is_pythonsense_suppress_keymaps = 1
 ```
 
 Note that if you just want to customize a few of the existing mappings (while keeping all the others), you do not need to suppress any key mappings: simply provide your own key mapping to each of the "``<Plug>``" mappings you want to override, and these will be respected, while any "``<Plug>``" maps that are not so explicitly bound will be assigned to the default key maps.
+So, for example, if you want to replace *just* the "``[m``", "``]m``", and "``]M``" default mappings with "``[f``", "``]f``", and "``]F``" respectively,you would specify the following in your "~/.vimrc":
 
+```
+map [f <Plug>(PythonsenseStartOfPythonFunction)
+map ]f <Plug>(PythonsenseStartOfNextPythonFunction)
+map ]F <Plug>(PythonsenseEndOfPythonFunction)
+```
 ## Installation
 
 ### Manually (Example)
