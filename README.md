@@ -106,7 +106,7 @@ For example, to replicate the default mappings you would define the following in
 map ac <Plug>(PythonsenseOuterClassTextObject)
 map ic <Plug>(PythonsenseInnerClassTextObject)
 map af <Plug>(PythonsenseOuterFunctionTextObject)
-map id <Plug>(PythonsenseInnerFunctionTextObject)
+map if <Plug>(PythonsenseInnerFunctionTextObject)
 map ad <Plug>(PythonsenseOuterDocStringTextObject)
 map id <Plug>(PythonsenseInnerDocStringTextObject)
 
