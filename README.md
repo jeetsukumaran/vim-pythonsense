@@ -124,14 +124,13 @@ If you prefer the stock Vim 8.0+ motions to the ones overridden by "Pythonsense"
 let g:is_pythonsense_suppress_motion_keymaps = 1
 ```
 
-If you want *both* the stock Vim 8.0+ motions, then you can also specify:
+If you want *both* the stock Vim 8.0+ motions, then you can [activate alternate mappings](#activating-alternative-motion-key-mappings) to the Pythonsense semantic motions that do not hide the the stock Vim 8.0+ motions by specifying the following in your "~/.vimrc":
 
 ```
 let g:is_pythonsense_alternate_motion_keymaps = 1
 ```
 
-in your "~/.vimrc" to activate alternate mappings to the Pythonsense semantic motions that do not hide the the stock Vim 8.0+ motions.
-See [below](activating-alternative-motion-key-mappings) for more details.
+See [below](#alternate-motion-key-mapping-list) for more details on these key mappings.
 
 ### Python Location Information
 
@@ -243,7 +242,7 @@ let g:is_pythonsense_alternate_motion_keymaps = 1
 ```
 in your "~/.vimrc".
 
-Then (unless you specify you want all or motion key mappings suppressed entirely), the "Pythonsense" semantic class/method/function motions will be bound to the keys below:
+Then (unless you specify you want all or motion key mappings suppressed entirely), the "Pythonsense" semantic class/method/function motions will be bound to the [alternate keys below](#alternate-motion-key-mapping-list):
 
 - "`]k`"  : Move (forward) to the beginning of the *next* Python class.
 - "`]K`"  : Move (forward) to the end of the *current* Python class.
