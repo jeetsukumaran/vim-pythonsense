@@ -154,7 +154,7 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
         " find class/function body
         let inner_start_line = obj_start_line
         while inner_start_line <= line('$')
-            if getline(inner_start_line) =~ '^.*[^#].*):\(\s*$\|\s*#.*$\)'
+            if getline(inner_start_line) =~# '^.*[^#].*):\(\s*$\|\s*#.*$\)'
                 break
             endif
             let inner_start_line += 1
@@ -218,7 +218,7 @@ function! pythonsense#get_start_decorators_line_nr(start)
     normal ^
     " let def_indent = indent(line("."))
     " normal k
-    " while (indent(line(".") == def_indent) && getline(".") =~ '\v^\s*\@')
+    " while (indent(line(".") == def_indent) && getline(".") =~# '\v^\s*\@')
     "     normal k
     " endwhile
     " return line(".") + 1
@@ -239,7 +239,7 @@ function! pythonsense#get_minmax_indent_count(pattern, line_range_start, line_ra
     let max_indent_count = -1
     while current_line <= a:line_range_end && current_line <= line('$')
         if getline(current_line) !~ '^\s*$'
-            if getline(current_line) =~ a:pattern
+            if getline(current_line) =~# a:pattern
                 let current_indent = pythonsense#get_line_indent_count(current_line)
                 if min_indent_count < 0 || current_indent < min_indent_count
                     let min_indent_count = current_indent
@@ -258,7 +258,7 @@ function! pythonsense#is_statement_encountered_between_two_lines(pattern, max_in
     let current_line = a:line_range_start
     while current_line <= a:line_range_end && current_line <= line('$')
         if getline(current_line) !~ '^\s*$'
-            if getline(current_line) =~ a:pattern
+            if getline(current_line) =~# a:pattern
                 let current_indent = pythonsense#get_line_indent_count(current_line)
                 if a:max_indent > -1 && current_indent < a:max_indent
                     return 1
@@ -300,8 +300,8 @@ function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_inden
     else
         let pattern = '^\s*' . '\(class\|def\)'
     endif
-    if getline(current_line) =~ pattern
-        if getline(current_line) =~ a:obj_name
+    if getline(current_line) =~# pattern
+        if getline(current_line) =~# a:obj_name
             return current_line
         endif
     endif
@@ -316,8 +316,8 @@ function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_inden
     let max_indent = target_line_indent
     while (current_line > 0 && current_line <= lastline)
         let pattern = '^' . indent_char . '\{0,' . max_indent . '}' . '\(class\|def\)'
-        if getline(current_line) =~ pattern
-            if getline(current_line) =~ a:obj_name
+        if getline(current_line) =~# pattern
+            if getline(current_line) =~# a:obj_name
                 return current_line
             else
                 if a:obj_name != 'class' && pythonsense#get_line_indent_count(current_line) <= max_indent
@@ -391,13 +391,13 @@ function! pythonsense#python_docstring_text_object (inner)
     " get current line number
     let s = line('.')
     " climb up to first def/class line, or first line of buffer
-    while s > 0 && getline(s) !~ '^\s*\(def\|class\)'
+    while s > 0 && getline(s) !~# '^\s*\(def\|class\)'
         let s = s - 1
     endwhile
     " set search start to just after def/class line, or on first buffer line
     let s = s + 1
     " descend lines obj_end_line end of buffer or def/class line
-    while s < line('$') && getline(s) !~ '^\s*\(def\|class\)'
+    while s < line('$') && getline(s) !~# '^\s*\(def\|class\)'
         " if line begins with optional whitespace followed by '''
         if getline(s) =~ "^\\s*'''" || getline(s) =~ '^\s*"""'
             if getline(s) =~ "^\\s*'''"
@@ -408,7 +408,7 @@ function! pythonsense#python_docstring_text_object (inner)
             " set search end to just after found start line
             let e = s + 1
             " descend lines obj_end_line end of buffer or def/class line
-            while e <= line('$') && getline(e) !~ '^\s*\(def\|class\)'
+            while e <= line('$') && getline(e) !~# '^\s*\(def\|class\)'
                 " if line ends with ''' followed by optional whitespace
                 if getline(e) =~ close_pattern
                     " TODO check first for blank lines above to select instead
@@ -447,41 +447,40 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
         let stepvalue = -1
     endif
     if a:to_end
-        let is_search_forward = 0
+        let find_start_of_block_step = -1
     else
-        let is_search_forward = a:fwd
+        let find_start_of_block_step = stepvalue
     endif
     let nreps_left = v:count1
     let pattern = '^\s*' . a:obj_name . '\s\+'
     let start_line = current_line
+    let target_line = current_line
+    if getline(start_line) =~# pattern && ! a:to_end
+        let start_line += stepvalue
+    endif
     while nreps_left > 0
-        while 1
-            if start_line <= 0 || start_line > line('$')
+        while start_line >= 0 && start_line <= line("$")
+            if getline(start_line) =~# pattern
+                let target_line = start_line
                 break
             endif
-            let next_target_line = pythonsense#trawl_search(pattern, start_line, is_search_forward)
-            if !next_target_line
-                let nreps_left = 0
-                break
-            endif
-            let target_line = next_target_line
-            if target_line == start_line
-                let start_line = start_line + stepvalue
-            else
-                break
-            endif
+            let start_line += find_start_of_block_step
         endwhile
-        if a:to_end
-            let obj_end_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
-            if ! obj_end_line
-                let obj_end_line = line("$")
-                let nreps_left = 0
-            endif
-            let target_line = obj_end_line
+        if start_line < 0 || start_line > line("$")
+            break
         endif
-        let start_line = target_line
         let nreps_left -= 1
     endwhile
+    if a:to_end
+        let obj_end_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
+        if ! obj_end_line
+            let obj_end_line = line("$")
+        endif
+        let target_line = obj_end_line
+    endif
+    if target_line == current_line || target_line < 0 || target_line > line('$')
+        return
+    endif
     let current_column = col('.')
     let preserve_col_pos = get(b:, "pythonsense_preserve_col_pos", get(g:, "pythonsense_preserve_col_pos", 0))
     let fold_open = ""
@@ -528,7 +527,7 @@ function! pythonsense#echo_python_location()
     while current_line > 0
         let pattern = '^' . indent_char . '\{0,' . target_line_indent . '}' . obj_pattern
         let current_line_text = getline(current_line)
-        if current_line_text =~ pattern
+        if current_line_text =~# pattern
             let obj_name = matchstr(current_line_text, '^\s*\(class\|def\)\s\+\zs\k\+')
             if get(g:, "pythonsense_extended_location_info", 1)
                 let obj_type = matchstr(current_line_text, '^\s*\zs\(class\|def\)')
