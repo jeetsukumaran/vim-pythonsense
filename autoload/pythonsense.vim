@@ -455,8 +455,19 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
     let pattern = '^\s*' . a:obj_name . '\s\+'
     let start_line = current_line
     let target_line = current_line
-    if getline(start_line) =~# pattern && ! a:to_end
-        let start_line += stepvalue
+    if getline(start_line) =~# pattern
+        if a:to_end
+            let target_line = pythonsense#get_object_end_line_nr(start_line, start_line, 1)
+            if ! target_line
+                let target_line = line("$")
+            endif
+            let start_line = target_line
+            let nreps_left -= 1
+        else
+            let start_line += stepvalue
+        endif
+    elseif a:to_end
+        let start_line -= 1
     endif
     while nreps_left > 0
         while start_line >= 0 && start_line <= line("$")
@@ -469,6 +480,7 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
         if start_line < 0 || start_line > line("$")
             break
         endif
+        let start_line += find_start_of_block_step
         let nreps_left -= 1
     endwhile
     if a:to_end
