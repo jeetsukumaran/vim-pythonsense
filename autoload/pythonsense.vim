@@ -417,7 +417,10 @@ function! pythonsense#python_docstring_text_object (inner)
                 if getline(e) =~ close_pattern
                     " TODO check first for blank lines above to select instead
                     " for 'around', extend search end through blank lines
-                    if !a:inner
+                    if a:inner
+                        let e -= 1
+                        let s += 1
+                    else
                         let x = e + 1
                         while x <= line('$') && getline(x) =~ '^\s*$'
                             let e = x
