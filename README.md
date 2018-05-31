@@ -49,75 +49,9 @@ class OneRing(object):             -----------------------------+
 - "`[m`"  : Move (backward) to the beginning of the *current* Python method or function (or to the beginning of the previous method or function if not currently in a method/function or already at the beginning of a method/function).
 - "`[M`"  : Move (backward) to the end of the *previous* Python method or function.
 
-Note that in Vim 8.0 or later, these motions are provided by default.
-Or rather, motions with these key-bindings are provided by default, and while in the simplest case they converge with "Pythonsense" in operation, they work with a different semantics, resulting in very different behavior in more complex cases.
-
-The stock Vim 8.0 "class" motions ("``]]``", "`[[`", etc.), find blocks that begin at the first column, *regardless* of whether or not these are class or function blocks, while its method/function motions ("``[m``", "``]m``", etc.) find all blocks at any indent *regardless* of whether or not these are class or function blocks.
-In contrast, "Pythonsense" class motions work on finding *all* and *only* class definitions, *regardless* of their indent level, while its method/function motions work on finding *all* and *only* method/function definitions, *regardless* of their indent level.
-The stock Vim 8.0 motions can thus be seen as non-semantically aware motions that target indent levels rather than Python classes/methods/functions, while the "Pythonsense" motions, on the other hand, can been seen as semantically aware motions that target Python classes/methods/functions rather than indent levels.
-In a simple structured file (without even bare functions), e.g.,
-
-```
-class Foo1(object):
-    def __init__(self):
-        pass
-    def bar(self):
-        pass
-    def baz(self):
-        pass
-class Foo2(object):
-    def __init__(self):
-        pass
-    def bar(self):
-        pass
-    def baz(self):
-        pass
-```
-
-both the stock Vim and "Pythonsense" motions work the same.
-
-However, in a file like the following:
-
-```
-
-class Foo1(object):
-    def __init__(self):
-        pass
-    def bar(self):
-        pass
-    def baz(self):
-        pass
-
-class Foo2(object):
-    class Foo2Exception1(Exception):
-        def __init__(self):
-            pass
-    class Foo2Exception2(Exception):
-        def __init__(self):
-            pass
-    def __init__(self):
-        pass
-    def bar(self):
-        pass
-    def baz(self):
-        pass
-
-def fn1(a):
-    pass
-
-def fn2(a):
-    pass
-
-def fn3(a):
-    pass
-
-```
-
-the differences in behavior show up:
-
--   With respect to the "``]]``"/"``[[``"/etc. motions, the stock Vim 8.0+ implementation will visit both top-level class and function definitions freely and miss the nested classes, while the "Pythonsense" implementation will visit *just* the class definitions exclusively and comprehensively (i.e., no functions and also include the nested classes in the visits).
--   With respect to the "``[m``"/"``]m``"/etc. motions, the stock Vim 8.0+ implementation will visit all class, method, and function definitions in the file, whereas the "Pythonsense" implementation will visit *just* the method and function definitions exclusively (i.e., no classes).
-
+Note that in Vim 8.0 or later, motions with these key-bindings are provided by default.
+While in the most simplest of cases they converge with "Pythonsense" in operation, they result in very different behavior in more complex cases.
+This difference ([discussed in detail below](#stock-vim-vs-pythonsense-motions)) basically comes down to "Pythonsense" providing semantically aware and contextual class-wise and method- or functionwise motions, while the stock Vim 8+ provides non-semantically aware indent-level based motions.
 If you prefer the stock Vim 8.0+ motions to the ones overridden by "Pythonsense", then, as described in the [section on suppressing the default key mappings](#suppressing-the-key-mappings), just specify the following in your "~/.vimrc":
 
 ```
@@ -284,6 +218,76 @@ If you are reading all this and wondering what is a text object or why are text 
     -   Handles nested cases better (or at all): multiple invocations of "``ic``", "``ac``", "``if``", "``af``", etc. grab successively enclosing classes/functions. The seed/inspiration for the logic for *this*, in turn, came from Michael Smith's "[vim-indent-object](http://github.com/michaeljsmith/vim-indent-object)".
 -   Code for the docstring text objects taken from the [pastebin shared by gfixler](https://pastebin.com/u/gfixler).
 
+## Appendices
+
+### [Stock Vim (8+) Object Motions vs. Pythonsense](#stock-vim-vs-pythonsense-motions)
+
+The stock Vim 8.0 "class" motions ("``]]``", "`[[`", etc.), find blocks that begin at the first column, *regardless* of whether or not these are class or function blocks, while its method/function motions ("``[m``", "``]m``", etc.) find all blocks at any indent *regardless* of whether or not these are class or function blocks.
+In contrast, "Pythonsense" class motions work on finding *all* and *only* class definitions, *regardless* of their indent level, while its method/function motions work on finding *all* and *only* method/function definitions, *regardless* of their indent level.
+The stock Vim 8.0 motions can thus be seen as non-semantically aware motions that target indent levels rather than Python classes/methods/functions, while the "Pythonsense" motions, on the other hand, can been seen as semantically aware motions that target Python classes/methods/functions rather than indent levels.
+In a simple structured file (without even bare functions), e.g.,
+
+```
+class Foo1(object):
+    def __init__(self):
+        pass
+    def bar(self):
+        pass
+    def baz(self):
+        pass
+class Foo2(object):
+    def __init__(self):
+        pass
+    def bar(self):
+        pass
+    def baz(self):
+        pass
+```
+
+both the stock Vim and "Pythonsense" motions work the same.
+
+However, in a file like the following:
+
+```
+
+class Foo1(object):
+    def __init__(self):
+        pass
+    def bar(self):
+        pass
+    def baz(self):
+        pass
+
+class Foo2(object):
+    class Foo2Exception1(Exception):
+        def __init__(self):
+            pass
+    class Foo2Exception2(Exception):
+        def __init__(self):
+            pass
+    def __init__(self):
+        pass
+    def bar(self):
+        pass
+    def baz(self):
+        pass
+
+def fn1(a):
+    pass
+
+def fn2(a):
+    pass
+
+def fn3(a):
+    pass
+
+```
+
+the differences in behavior show up:
+
+-   With respect to the "``]]``"/"``[[``"/etc. motions, the stock Vim 8.0+ implementation will visit both top-level class and function definitions freely and miss the nested classes, while the "Pythonsense" implementation will visit *just* the class definitions exclusively and comprehensively (i.e., no functions and also include the nested classes in the visits).
+-   With respect to the "``[m``"/"``]m``"/etc. motions, the stock Vim 8.0+ implementation will visit all class, method, and function definitions in the file, whereas the "Pythonsense" implementation will visit *just* the method and function definitions exclusively (i.e., no classes).
+
 ## Copyright and License
 
 Copyright (C) 2018 Jeet Sukumaran.
@@ -293,3 +297,4 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
