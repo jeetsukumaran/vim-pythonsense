@@ -220,7 +220,7 @@ If you are reading all this and wondering what is a text object or why are text 
 
 ## Appendices
 
-### [Stock Vim (8+) Object Motions vs. Pythonsense](#stock-vim-vs-pythonsense-motions)
+### [Stock Vim vs Pythonsense Motions](#stock-vim-vs-pythonsense-motions)
 
 The stock Vim 8.0 "class" motions ("``]]``", "`[[`", etc.), find blocks that begin at the first column, *regardless* of whether or not these are class or function blocks, while its method/function motions ("``[m``", "``]m``", etc.) find all blocks at any indent *regardless* of whether or not these are class or function blocks.
 In contrast, "Pythonsense" class motions work on finding *all* and *only* class definitions, *regardless* of their indent level, while its method/function motions work on finding *all* and *only* method/function definitions, *regardless* of their indent level.
