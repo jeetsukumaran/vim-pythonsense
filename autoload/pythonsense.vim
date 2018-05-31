@@ -440,26 +440,35 @@ endfunction
 " Python Movements {{{1
 function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) range
     let nreps = v:count1
+    if a:fwd
+        let start_line = a:lastline
+    else
+        let start_line = a:firstline
+    endif
     if a:to_end
-        if a:fwd
-            let start_line = a:lastline
-        else
-            let start_line = a:firstline
-        endif
         let pattern = '^\s*' . a:obj_name . '\s\+'
-        if getline(start_line) =~# pattern || ! a:fwd
-            " either way, seek out previous occurring pattern before
-            " proceeding
-            while start_line >= 0 && getline(start_line) =~# pattern
+        if (a:fwd && getline(start_line) !=# pattern) || (!a:fwd && getline(start_line) =~# pattern)
+            " if !a:fwd && getline(start_line) =~# pattern
+            " endif
+            while start_line >= 0 && getline(start_line) !~# pattern
                 let start_line -= 1
             endwhile
             if start_line < 0
                 return
             endif
             let nreps -= 1
+        elseif (!a:fwd && getline(start_line) !~# pattern)
+            while start_line >= 0 && getline(start_line) !~# pattern
+                let start_line -= 1
+            endwhile
+            if start_line < 0
+                return
+            " elseif start_line == 0
+            endif
+            let start_line -= 1
         endif
     endif
-    let [current_line, target_line] = pythonsense#move_to_start_of_python_object(a:obj_name, a:fwd, a:vim_mode, nreps)
+    let target_line = pythonsense#move_to_start_of_python_object(a:obj_name, start_line, a:fwd, a:vim_mode, nreps)
     if target_line < 0 || target_line > line('$')
         return
     endif
@@ -487,12 +496,11 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
     endtry
 endfunction
 
-function! pythonsense#move_to_start_of_python_object(obj_name, fwd, vim_mode, nreps) range
+function! pythonsense#move_to_start_of_python_object(obj_name, start_line, fwd, vim_mode, nreps)
+    let current_line = a:start_line
     if a:fwd
-        let current_line = a:lastline
         let stepvalue = 1
     else
-        let current_line = a:firstline
         let stepvalue = -1
     endif
     let pattern = '^\s*' . a:obj_name . '\s\+'
@@ -516,7 +524,7 @@ function! pythonsense#move_to_start_of_python_object(obj_name, fwd, vim_mode, nr
         let start_line += stepvalue
         let nreps_left -= 1
     endwhile
-    return [current_line, target_line]
+    return target_line
 endfunction
 
 " }}}1
