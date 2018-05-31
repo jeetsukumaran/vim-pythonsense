@@ -359,7 +359,6 @@ function! pythonsense#python_text_object(obj_name, inner, mode)
     let nreps_left = 1 "v:count1
     while nreps_left > 0
         let lnrange = pythonsense#select_named_object(a:obj_name, a:inner, lnrange)
-        execute "normal! \<ESC>gv"
         if lnrange[0] == -1
             break
         endif
