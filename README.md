@@ -46,7 +46,7 @@ class OneRing(object):             -----------------------------+
 
 - "`]m`"  : Move (forward) to the beginning of the *next* Python method or function.
 - "`]M`"  : Move (forward) to the end of the *current* Python method or function.
-- "`[m`"  : Move (forward) to the beginning of the *current* Python method or function (or to the beginning of the previous method or function if not currently in a method/function or already at the beginning of a method/function).
+- "`[m`"  : Move (backward) to the beginning of the *current* Python method or function (or to the beginning of the previous method or function if not currently in a method/function or already at the beginning of a method/function).
 - "`[M`"  : Move (backward) to the end of the *previous* Python method or function.
 
 ### Python Location Information
