@@ -39,13 +39,15 @@ class OneRing(object):             -----------------------------+
 
 ### Python Object Motions
 
-- "`[[`"  : Move to start of the *current* Python class (or start of previous Python class if not currently in a class or already at the start of a class).
-- "`]]`"  : Move to start of the *next* Python class.
-- "`][`"  : Move to end of the *current* Python class.
+- "`]]`"  : Move (forward) to the beginning of the *next* Python class.
+- "`][`"  : Move (forward) to the end of the *current* Python class.
+- "`[[`"  : Move (backward) to beginning of the *current* Python class (or beginning of the previous Python class if not currently in a class or already at the beginning of a class).
+- "`[]`"  : Move (backward) to end of the *previous* Python class.
 
-- "`[m`"  : Move to start of the *current* Python function or method (or to the start of previous function or method if not currently in a function or method or already at the start of a function or method).
-- "`]m`"  : Move to start of the *next* Python function or method.
-- "`]M`"  : Move to end of the *current* Python function or method.
+- "`]m`"  : Move (forward) to the beginning of the *next* Python method or function.
+- "`]M`"  : Move (forward) to the end of the *current* Python method or function.
+- "`[m`"  : Move (forward) to the beginning of the *current* Python method or function (or to the beginning of the previous method or function if not currently in a method/function or already at the beginning of a method/function).
+- "`[M`"  : Move (backward) to the end of the *previous* Python method or function.
 
 ### Python Location Information
 
@@ -110,12 +112,14 @@ map if <Plug>(PythonsenseInnerFunctionTextObject)
 map ad <Plug>(PythonsenseOuterDocStringTextObject)
 map id <Plug>(PythonsenseInnerDocStringTextObject)
 
-map [[ <Plug>(PythonsenseStartOfPythonClass)
 map ]] <Plug>(PythonsenseStartOfNextPythonClass)
 map ][ <Plug>(PythonsenseEndOfPythonClass)
-map [m <Plug>(PythonsenseStartOfPythonFunction)
+map [[ <Plug>(PythonsenseStartOfPythonClass)
+map [] <Plug>(PythonsenseEndOfPreviousPythonClass)
 map ]m <Plug>(PythonsenseStartOfNextPythonFunction)
 map ]M <Plug>(PythonsenseEndOfPythonFunction)
+map [m <Plug>(PythonsenseStartOfPythonFunction)
+map [M <Plug>(PythonsenseEndOfPreviousPythonFunction)
 
 map g: <Plug>(PythonsensePyWhere)
 ```
@@ -137,12 +141,13 @@ let g:is_pythonsense_suppress_keymaps = 1
 ```
 
 Note that if you just want to customize a few of the existing mappings (while keeping all the others), you do not need to suppress any key mappings: simply provide your own key mapping to each of the "``<Plug>``" mappings you want to override, and these will be respected, while any "``<Plug>``" maps that are not so explicitly bound will be assigned to the default key maps.
-So, for example, if you want to replace *just* the "``[m``", "``]m``", and "``]M``" default mappings with "``[f``", "``]f``", and "``]F``" respectively,you would specify the following in your "~/.vimrc":
+So, for example, if you want to replace *just* the "``]m``", "``]M``", "``[m``", and "``[M``" default mappings with "``]f``", "``]F``", "``[f``", and "``[F``" respectively,you would specify the following in your "~/.vimrc":
 
 ```
-map [f <Plug>(PythonsenseStartOfPythonFunction)
 map ]f <Plug>(PythonsenseStartOfNextPythonFunction)
 map ]F <Plug>(PythonsenseEndOfPythonFunction)
+map [f <Plug>(PythonsenseStartOfPythonFunction)
+map [F <Plug>(PythonsenseEndOfPreviousPythonFunction)
 ```
 
 ## Similar Projects
