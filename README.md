@@ -118,7 +118,7 @@ the differences in behavior show up:
 -   With respect to the "``]]``"/"``[[``"/etc. motions, the stock Vim 8.0+ implementation will visit both top-level class and function definitions freely and miss the nested classes, while the "Pythonsense" implementation will visit *just* the class definitions exclusively and comprehensively (i.e., no functions and also include the nested classes in the visits).
 -   With respect to the "``[m``"/"``]m``"/etc. motions, the stock Vim 8.0+ implementation will visit all class, method, and function definitions in the file, whereas the "Pythonsense" implementation will visit *just* the method and function definitions exclusively (i.e., no classes).
 
-If you wish to have access to both types of motions, i.e., the stock Vim 8.0+ non-semantic indent-based block motions as well as the "Pythonsense" semantically aware class/method/function motions, then I suggest you specify the following in your "~/.vimrc":
+If you wish to have access to both types of motions, i.e., the stock Vim 8.0+ non-semantic indent-based block motions as well as the "Pythonsense" semantically aware class/method/function motions, then I suggest you specify something like the following in your "~/.vim/ftplugin/python/pythonsense-custom.vim":
 
 ```
 map <buffer> [^ <Plug>(PythonsenseStartOfPythonClass)
