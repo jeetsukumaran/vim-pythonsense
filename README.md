@@ -130,7 +130,7 @@ If you want *both* the stock Vim 8.0+ motions, then you can [activate alternate 
 let g:is_pythonsense_alternate_motion_keymaps = 1
 ```
 
-See [below](#alternate-motion-key-mapping-list) for more details on these key mappings.
+See [below](#activating-alternative-motion-key-mappings) for more details on these key mappings.
 
 ### Python Location Information
 
@@ -242,7 +242,7 @@ let g:is_pythonsense_alternate_motion_keymaps = 1
 ```
 in your "~/.vimrc".
 
-Then (unless you specify you want all or motion key mappings suppressed entirely), the "Pythonsense" semantic class/method/function motions will be bound to the [alternate keys below](#alternate-motion-key-mapping-list):
+Then (unless you specify you want all or motion key mappings suppressed entirely), the "Pythonsense" semantic class/method/function motions will be bound to the alternate keys below:
 
 - "`]k`"  : Move (forward) to the beginning of the *next* Python class.
 - "`]K`"  : Move (forward) to the end of the *current* Python class.
