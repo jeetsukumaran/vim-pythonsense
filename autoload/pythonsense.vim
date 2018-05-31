@@ -123,12 +123,11 @@ function! pythonsense#select_named_object(obj_name, inner, range)
     endwhile
 
     " select range
-    exec obj_start_line
     if obj_end_line >= obj_start_line
+        exec obj_start_line
         execute "normal! V" . obj_end_line . "G"
         return [obj_start_line, obj_end_line]
     else
-        execute "normal! VG"
         return [-1, -1]
     endif
 
@@ -376,8 +375,8 @@ function! pythonsense#python_text_object(obj_name, inner, mode)
         endif
         " let s:pythonsense_obj_start_line = -1
         " let s:pythonsense_obj_end_line = -1
+        " execute "normal! \<ESC>gv"
     endif
-    execute "normal! \<ESC>gv"
 endfunction
 
 function! pythonsense#python_function_text_object(inner, mode)

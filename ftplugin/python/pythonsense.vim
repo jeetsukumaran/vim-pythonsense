@@ -45,10 +45,10 @@ onoremap <buffer> <silent> <Plug>(PythonsenseOuterClassTextObject) :<C-u>call py
 onoremap <buffer> <silent> <Plug>(PythonsenseInnerClassTextObject) :<C-u>call pythonsense#python_class_text_object(1, "o")<CR>
 onoremap <buffer> <silent> <Plug>(PythonsenseOuterDocStringTextObject) :<C-u>call pythonsense#python_docstring_text_object(0)<CR>
 onoremap <buffer> <silent> <Plug>(PythonsenseInnerDocStringTextObject) :<C-u>call pythonsense#python_docstring_text_object(1)<CR>
-vnoremap <buffer> <silent> <Plug>(PythonsenseOuterFunctionTextObject) :<C-u>call pythonsense#python_function_text_object(0, "v")<CR>
-vnoremap <buffer> <silent> <Plug>(PythonsenseInnerFunctionTextObject) :<C-u>call pythonsense#python_function_text_object(1, "v")<CR>
-vnoremap <buffer> <silent> <Plug>(PythonsenseOuterClassTextObject) :<C-u>call pythonsense#python_class_text_object(0, "v")<CR>
-vnoremap <buffer> <silent> <Plug>(PythonsenseInnerClassTextObject) :<C-u>call pythonsense#python_class_text_object(1, "v")<CR>
+vnoremap <buffer> <silent> <Plug>(PythonsenseOuterFunctionTextObject) :<C-u>call pythonsense#python_function_text_object(0, "v")<CR><Esc>gv
+vnoremap <buffer> <silent> <Plug>(PythonsenseInnerFunctionTextObject) :<C-u>call pythonsense#python_function_text_object(1, "v")<CR><Esc>gv
+vnoremap <buffer> <silent> <Plug>(PythonsenseOuterClassTextObject) :<C-u>call pythonsense#python_class_text_object(0, "v")<CR><Esc>gv
+vnoremap <buffer> <silent> <Plug>(PythonsenseInnerClassTextObject) :<C-u>call pythonsense#python_class_text_object(1, "v")<CR><Esc>gv
 vnoremap <buffer> <silent> <Plug>(PythonsenseOuterDocStringTextObject) :<C-u>cal pythonsense#python_docstring_text_object(0)<CR>
 vnoremap <buffer> <silent> <Plug>(PythonsenseInnerDocStringTextObject) :<C-u>cal pythonsense#python_docstring_text_object(1)<CR>
 
