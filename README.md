@@ -288,13 +288,10 @@ the differences in behavior show up:
 -   With respect to the "``]]``"/"``[[``"/etc. motions, the stock Vim 8.0+ implementation will visit both top-level class and function definitions freely and miss the nested classes, while the "Pythonsense" implementation will visit *just* the class definitions exclusively and comprehensively (i.e., no functions and also include the nested classes in the visits).
 -   With respect to the "``[m``"/"``]m``"/etc. motions, the stock Vim 8.0+ implementation will visit all class, method, and function definitions in the file, whereas the "Pythonsense" implementation will visit *just* the method and function definitions exclusively (i.e., no classes).
 
-## Copyright and License
+## Copyright, License, and Warranty
 
-Copyright (C) 2018 Jeet Sukumaran.
+Copyright (c) 2018 Jeet Sukumaran. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+This work is licensed under the terms of the (expat) MIT license.
+See the file "LICENSE" (or https://opensource.org/licenses/MIT) for specific terms and details.
 
