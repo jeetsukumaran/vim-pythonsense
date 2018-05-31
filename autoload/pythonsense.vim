@@ -450,33 +450,37 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
         let current_line = a:firstline
         let stepvalue = -1
     endif
-    let pattern = '^\s*' . a:obj_name . '\s\+'
     if a:to_end
         let is_search_forward = 0
     else
         let is_search_forward = a:fwd
     endif
-    while 1
-        if current_line <= 0 || current_line > line('$')
-            return
+    let nreps_left = v:count1
+    let pattern = '^\s*' . a:obj_name . '\s\+'
+    while nreps_left > 0
+        while 1
+            if current_line <= 0 || current_line > line('$')
+                return
+            endif
+            let target_line = pythonsense#trawl_search(pattern, current_line, is_search_forward)
+            if !target_line
+                return
+            elseif target_line == current_line
+                let current_line = current_line + stepvalue
+            else
+                break
+            endif
+        endwhile
+        if a:to_end
+            let obj_end_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
+            if ! obj_end_line
+                return
+            endif
+            let target_line = obj_end_line
         endif
-        let target_line = pythonsense#trawl_search(pattern, current_line, is_search_forward)
-        if !target_line
-            return
-        elseif target_line == current_line
-            let current_line = current_line + stepvalue
-        else
-            break
-        endif
+        let current_line = target_line
+        let nreps_left -= 1
     endwhile
-    if a:to_end
-        let obj_end_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
-        echom target_line . ", " . obj_end_line
-        if ! obj_end_line
-            return
-        endif
-        let target_line = obj_end_line
-    endif
     let current_column = col('.')
     let preserve_col_pos = get(b:, "pythonsense_preserve_col_pos", get(g:, "pythonsense_preserve_col_pos", 0))
     let fold_open = ""
