@@ -368,7 +368,6 @@ function! pythonsense#python_text_object(obj_name, inner, mode)
         let nreps_left -= 1
     endwhile
     if lnrange[0] != -1
-        exec "normal! \<ESC>gvo"
         if has("folding") && foldclosed(line('.')) != -1
             " try
             "     execute "normal! zO"
