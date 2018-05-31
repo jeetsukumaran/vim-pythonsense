@@ -439,57 +439,7 @@ endfunction
 
 " Python Movements {{{1
 function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) range
-    if a:fwd
-        let current_line = a:lastline
-        let stepvalue = 1
-    else
-        let current_line = a:firstline
-        let stepvalue = -1
-    endif
-    if a:to_end
-        let find_start_of_block_step = -1
-    else
-        let find_start_of_block_step = stepvalue
-    endif
-    let nreps_left = v:count1
-    let pattern = '^\s*' . a:obj_name . '\s\+'
-    let start_line = current_line
-    let target_line = current_line
-    if getline(start_line) =~# pattern
-        if a:to_end
-            let target_line = pythonsense#get_object_end_line_nr(start_line, start_line, 1)
-            if ! target_line
-                let target_line = line("$")
-            endif
-            let start_line = target_line
-            let nreps_left -= 1
-        else
-            let start_line += stepvalue
-        endif
-    elseif a:to_end
-        let start_line -= 1
-    endif
-    while nreps_left > 0
-        while start_line >= 0 && start_line <= line("$")
-            if getline(start_line) =~# pattern
-                let target_line = start_line
-                break
-            endif
-            let start_line += find_start_of_block_step
-        endwhile
-        if start_line < 0 || start_line > line("$")
-            break
-        endif
-        let start_line += find_start_of_block_step
-        let nreps_left -= 1
-    endwhile
-    if a:to_end
-        let obj_end_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
-        if ! obj_end_line
-            let obj_end_line = line("$")
-        endif
-        let target_line = obj_end_line
-    endif
+    let [current_line, target_line] = pythonsense#move_to_start_of_python_object(a:obj_name, a:fwd, a:vim_mode, v:count1)
     if target_line == current_line || target_line < 0 || target_line > line('$')
         return
     endif
@@ -512,6 +462,38 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
         endif
     catch /E490/ " no fold found
     endtry
+endfunction
+
+function! pythonsense#move_to_start_of_python_object(obj_name, fwd, vim_mode, nreps) range
+    if a:fwd
+        let current_line = a:lastline
+        let stepvalue = 1
+    else
+        let current_line = a:firstline
+        let stepvalue = -1
+    endif
+    let nreps_left = a:nreps
+    let pattern = '^\s*' . a:obj_name . '\s\+'
+    let start_line = current_line
+    let target_line = current_line
+    if getline(start_line) =~# pattern
+        let start_line += stepvalue
+    endif
+    while nreps_left > 0
+        while start_line >= 0 && start_line <= line("$")
+            if getline(start_line) =~# pattern
+                let target_line = start_line
+                break
+            endif
+            let start_line += stepvalue
+        endwhile
+        if start_line < 0 || start_line > line("$")
+            break
+        endif
+        let start_line += stepvalue
+        let nreps_left -= 1
+    endwhile
+    return [current_line, target_line]
 endfunction
 
 " }}}1
