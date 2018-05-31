@@ -49,6 +49,75 @@ class OneRing(object):             -----------------------------+
 - "`[m`"  : Move (backward) to the beginning of the *current* Python method or function (or to the beginning of the previous method or function if not currently in a method/function or already at the beginning of a method/function).
 - "`[M`"  : Move (backward) to the end of the *previous* Python method or function.
 
+Note that in Vim 8.0 or later, these motions are provided by default.
+Or rather, motions with these key-bindings are provided by default, and while in the simplest case they converge with "Pythonsense" in operation, they work with a different semantics, resulting in very different behavior in more complex cases.
+
+The stock Vim 8.0 "class" motions ("``]]``", "`[[`", etc.), find blocks that begin at the first column, *regardless* of whether or not these are class or function blocks, while its method/function motions ("``[m``", "``]m``", etc.) find all blocks at any indent *regardless* of whether or not these are class or function blocks.
+In contrast, "Pythonsense" class motions work on finding *all* and *only* class definitions, *regardless* of their indent level, while its method/function motions work on finding *all* and *only* method/function definitions, *regardless* of their indent level.
+The stock Vim 8.0 motions can thus be seen as non-semantically aware motions that target indent levels rather than Python classes/methods/functions, while the "Pythonsense" motions, on the other hand, can been seen as semantically aware motions that target Python classes/methods/functions rather than indent levels.
+In a simple structured file (without even bare functions), e.g.,
+
+```
+class Foo1(object):
+    def __init__(self):
+        pass
+    def bar(self):
+        pass
+    def baz(self):
+        pass
+class Foo2(object):
+    def __init__(self):
+        pass
+    def bar(self):
+        pass
+    def baz(self):
+        pass
+```
+
+both the stock Vim and "Pythonsense" motions work the same.
+
+However, in a file like the following:
+
+```
+
+class Foo1(object):
+    def __init__(self):
+        pass
+    def bar(self):
+        pass
+    def baz(self):
+        pass
+
+class Foo2(object):
+    class Foo2Exception1(Exception):
+        def __init__(self):
+            pass
+    class Foo2Exception2(Exception):
+        def __init__(self):
+            pass
+    def __init__(self):
+        pass
+    def bar(self):
+        pass
+    def baz(self):
+        pass
+
+def fn1(a):
+    pass
+
+def fn2(a):
+    pass
+
+def fn3(a):
+    pass
+
+```
+
+the differences in behavior show up:
+
+-   With respect to the "``]]``"/"``[[``"/etc. motions, the stock Vim 8.0+ implementation will visit both top-level class and function definitions freely and miss the nested classes, while the "Pythonsense" implementation will visit *just* the class definitions exclusively and comprehensively (i.e., no functions and also include the nested classes in the visits).
+-   With respect to the "``[m``"/"``]m``"/etc. motions, the stock Vim 8.0+ implementation will visit all class, method, and function definitions in the file, whereas the "Pythonsense" implementation will visit *just* the method and function definitions exclusively (i.e., no classes).
+
 ### Python Location Information
 
 - "`g:`" : print (echo) current semantic location (e.g. ""``(class:)Foo > (def:)bar"``")
