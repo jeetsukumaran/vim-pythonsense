@@ -457,12 +457,15 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
     while nreps_left > 0
         while 1
             if start_line <= 0 || start_line > line('$')
-                return
+                break
             endif
-            let target_line = pythonsense#trawl_search(pattern, start_line, is_search_forward)
-            if !target_line
-                return
-            elseif target_line == start_line
+            let next_target_line = pythonsense#trawl_search(pattern, start_line, is_search_forward)
+            if !next_target_line
+                let nreps_left = 0
+                break
+            endif
+            let target_line = next_target_line
+            if target_line == start_line
                 let start_line = start_line + stepvalue
             else
                 break
@@ -471,7 +474,8 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
         if a:to_end
             let obj_end_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
             if ! obj_end_line
-                return
+                let obj_end_line = line("$")
+                let nreps_left = 0
             endif
             let target_line = obj_end_line
         endif
