@@ -280,10 +280,6 @@ function! pythonsense#get_indent_char()
 endfunction
 
 function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_indent_level, start_line, fwd)
-    " let target_line_indent = indent(current_line)
-    " let head_pattern = '^\s\{0,' . target_line_indent. '}' . a:obj_name
-    " let head_lnum = pythonsense#trawl_search(head_pattern, current_line, a:fwd)
-    " return head_lnum
     let lastline = line('$')
     if a:fwd
         let stepvalue = 1
@@ -457,16 +453,17 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
     endif
     let nreps_left = v:count1
     let pattern = '^\s*' . a:obj_name . '\s\+'
+    let start_line = current_line
     while nreps_left > 0
         while 1
-            if current_line <= 0 || current_line > line('$')
+            if start_line <= 0 || start_line > line('$')
                 return
             endif
-            let target_line = pythonsense#trawl_search(pattern, current_line, is_search_forward)
+            let target_line = pythonsense#trawl_search(pattern, start_line, is_search_forward)
             if !target_line
                 return
-            elseif target_line == current_line
-                let current_line = current_line + stepvalue
+            elseif target_line == start_line
+                let start_line = start_line + stepvalue
             else
                 break
             endif
@@ -478,7 +475,7 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
             endif
             let target_line = obj_end_line
         endif
-        let current_line = target_line
+        let start_line = target_line
         let nreps_left -= 1
     endwhile
     let current_column = col('.')
