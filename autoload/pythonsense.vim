@@ -439,9 +439,32 @@ endfunction
 
 " Python Movements {{{1
 function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) range
-    let [current_line, target_line] = pythonsense#move_to_start_of_python_object(a:obj_name, a:fwd, a:vim_mode, v:count1)
-    if target_line == current_line || target_line < 0 || target_line > line('$')
+    let nreps = v:count1
+    if a:to_end
+        if a:fwd
+            let start_line = a:lastline
+        else
+            let start_line = a:firstline
+        endif
+        let pattern = '^\s*' . a:obj_name . '\s\+'
+        if getline(start_line) =~# pattern || ! a:fwd
+            " either way, seek out previous occurring pattern before
+            " proceeding
+            while start_line >= 0 && getline(start_line) =~# pattern
+                let start_line -= 1
+            endwhile
+            if start_line < 0
+                return
+            endif
+            let nreps -= 1
+        endif
+    endif
+    let [current_line, target_line] = pythonsense#move_to_start_of_python_object(a:obj_name, a:fwd, a:vim_mode, nreps)
+    if target_line < 0 || target_line > line('$')
         return
+    endif
+    if a:to_end
+        let target_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
     endif
     let current_column = col('.')
     let preserve_col_pos = get(b:, "pythonsense_preserve_col_pos", get(g:, "pythonsense_preserve_col_pos", 0))
@@ -472,8 +495,8 @@ function! pythonsense#move_to_start_of_python_object(obj_name, fwd, vim_mode, nr
         let current_line = a:firstline
         let stepvalue = -1
     endif
-    let nreps_left = a:nreps
     let pattern = '^\s*' . a:obj_name . '\s\+'
+    let nreps_left = a:nreps
     let start_line = current_line
     let target_line = current_line
     if getline(start_line) =~# pattern
