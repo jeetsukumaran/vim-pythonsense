@@ -118,6 +118,19 @@ the differences in behavior show up:
 -   With respect to the "``]]``"/"``[[``"/etc. motions, the stock Vim 8.0+ implementation will visit both top-level class and function definitions freely and miss the nested classes, while the "Pythonsense" implementation will visit *just* the class definitions exclusively and comprehensively (i.e., no functions and also include the nested classes in the visits).
 -   With respect to the "``[m``"/"``]m``"/etc. motions, the stock Vim 8.0+ implementation will visit all class, method, and function definitions in the file, whereas the "Pythonsense" implementation will visit *just* the method and function definitions exclusively (i.e., no classes).
 
+If you wish to have access to both types of motions, i.e., the stock Vim 8.0+ non-semantic indent-based block motions as well as the "Pythonsense" semantically aware class/method/function motions, then I suggest you specify the following in your "~/.vimrc":
+
+```
+map <buffer> [^ <Plug>(PythonsenseStartOfPythonClass)
+map <buffer> ]^ <Plug>(PythonsenseEndOfPythonClass)
+map <buffer> ]$ <Plug>(PythonsenseStartOfNextPythonClass)
+map <buffer> [$ <Plug>(PythonsenseEndOfPreviousPythonClass)
+map <buffer> [f <Plug>(PythonsenseStartOfPythonFunction)
+map <buffer> ]F <Plug>(PythonsenseEndOfPythonFunction)
+map <buffer> ]f <Plug>(PythonsenseStartOfNextPythonFunction)
+map <buffer> [F <Plug>(PythonsenseEndOfPreviousPythonFunction)
+```
+
 ### Python Location Information
 
 - "`g:`" : print (echo) current semantic location (e.g. ""``(class:)Foo > (def:)bar"``")
@@ -148,7 +161,7 @@ However, if you are stuck with an old version of Vim and *really* do not or cann
 
 ### [Vim-Plug](https://github.com/junegunn/vim-plug)
 
-Add the line below into your _.vimrc_ :
+Add the line below into your "~/.vimrc":
 
     Plug 'jeetsukumaran/vim-pythonsense'
 
@@ -160,7 +173,7 @@ More information on setting up [Vim-Plug](https://github.com/junegunn/vim-plug) 
 
 ### [Vundle](https://github.com/gmarik/vundle.git)
 
-Add the line below into your _.vimrc_ :
+Add the line below into your "~/.vimrc":
 
     Vundle 'jeetsukumaran/vim-pythonsense'
 
@@ -171,29 +184,29 @@ or run:
 ## Customization
 
 If you are unhappy with the default key-mappings you define your own which will individually override the default ones.
-For example, to replicate the default mappings you would define the following in your "~/.vimrc":
+For example, to replicate the default mappings you would define the following in "~/.vim/ftplugin/python/pythonsense-custom.vim":
 
 ```
-map ac <Plug>(PythonsenseOuterClassTextObject)
-map ic <Plug>(PythonsenseInnerClassTextObject)
-map af <Plug>(PythonsenseOuterFunctionTextObject)
-map if <Plug>(PythonsenseInnerFunctionTextObject)
-map ad <Plug>(PythonsenseOuterDocStringTextObject)
-map id <Plug>(PythonsenseInnerDocStringTextObject)
+map <buffer> ac <Plug>(PythonsenseOuterClassTextObject)
+map <buffer> ic <Plug>(PythonsenseInnerClassTextObject)
+map <buffer> af <Plug>(PythonsenseOuterFunctionTextObject)
+map <buffer> if <Plug>(PythonsenseInnerFunctionTextObject)
+map <buffer> ad <Plug>(PythonsenseOuterDocStringTextObject)
+map <buffer> id <Plug>(PythonsenseInnerDocStringTextObject)
 
-map ]] <Plug>(PythonsenseStartOfNextPythonClass)
-map ][ <Plug>(PythonsenseEndOfPythonClass)
-map [[ <Plug>(PythonsenseStartOfPythonClass)
-map [] <Plug>(PythonsenseEndOfPreviousPythonClass)
-map ]m <Plug>(PythonsenseStartOfNextPythonFunction)
-map ]M <Plug>(PythonsenseEndOfPythonFunction)
-map [m <Plug>(PythonsenseStartOfPythonFunction)
-map [M <Plug>(PythonsenseEndOfPreviousPythonFunction)
+map <buffer> ]] <Plug>(PythonsenseStartOfNextPythonClass)
+map <buffer> ][ <Plug>(PythonsenseEndOfPythonClass)
+map <buffer> [[ <Plug>(PythonsenseStartOfPythonClass)
+map <buffer> [] <Plug>(PythonsenseEndOfPreviousPythonClass)
+map <buffer> ]m <Plug>(PythonsenseStartOfNextPythonFunction)
+map <buffer> ]M <Plug>(PythonsenseEndOfPythonFunction)
+map <buffer> [m <Plug>(PythonsenseStartOfPythonFunction)
+map <buffer> [M <Plug>(PythonsenseEndOfPreviousPythonFunction)
 
-map g: <Plug>(PythonsensePyWhere)
+map <buffer> g: <Plug>(PythonsensePyWhere)
 ```
 
-If you want to suppress some of the key mappings entirely (i.e., without providing your own to override the functionality), you can specify one or more of the following:
+If you want to suppress some of the key mappings entirely (i.e., without providing your own to override the functionality), you can specify one or more of the following in your "~/.vimrc":
 
 ```
 let g:is_pythonsense_suppress_object_keymaps = 1
@@ -210,13 +223,13 @@ let g:is_pythonsense_suppress_keymaps = 1
 ```
 
 Note that if you just want to customize a few of the existing mappings (while keeping all the others), you do not need to suppress any key mappings: simply provide your own key mapping to each of the "``<Plug>``" mappings you want to override, and these will be respected, while any "``<Plug>``" maps that are not so explicitly bound will be assigned to the default key maps.
-So, for example, if you want to replace *just* the "``]m``", "``]M``", "``[m``", and "``[M``" default mappings with "``]f``", "``]F``", "``[f``", and "``[F``" respectively,you would specify the following in your "~/.vimrc":
+So, for example, if you want to replace *just* the "``]m``", "``]M``", "``[m``", and "``[M``" default mappings with "``]f``", "``]F``", "``[f``", and "``[F``" respectively,you would specify the following in "~/.vim/ftplugin/python/pythonsense-custom.vim":
 
 ```
-map ]f <Plug>(PythonsenseStartOfNextPythonFunction)
-map ]F <Plug>(PythonsenseEndOfPythonFunction)
-map [f <Plug>(PythonsenseStartOfPythonFunction)
-map [F <Plug>(PythonsenseEndOfPreviousPythonFunction)
+map <buffer> ]f <Plug>(PythonsenseStartOfNextPythonFunction)
+map <buffer> ]F <Plug>(PythonsenseEndOfPythonFunction)
+map <buffer> [f <Plug>(PythonsenseStartOfPythonFunction)
+map <buffer> [F <Plug>(PythonsenseEndOfPreviousPythonFunction)
 ```
 
 ## Similar Projects
