@@ -118,18 +118,20 @@ the differences in behavior show up:
 -   With respect to the "``]]``"/"``[[``"/etc. motions, the stock Vim 8.0+ implementation will visit both top-level class and function definitions freely and miss the nested classes, while the "Pythonsense" implementation will visit *just* the class definitions exclusively and comprehensively (i.e., no functions and also include the nested classes in the visits).
 -   With respect to the "``[m``"/"``]m``"/etc. motions, the stock Vim 8.0+ implementation will visit all class, method, and function definitions in the file, whereas the "Pythonsense" implementation will visit *just* the method and function definitions exclusively (i.e., no classes).
 
-If you wish to have access to both types of motions, i.e., the stock Vim 8.0+ non-semantic indent-based block motions as well as the "Pythonsense" semantically aware class/method/function motions, then I suggest you specify something like the following in your "~/.vim/ftplugin/python/pythonsense-custom.vim":
+If you prefer the stock Vim 8.0+ motions to the ones overridden by "Pythonsense", then, as described in the [section on suppressing the default key mappings](#suppressing-the-key-mappings), just specify the following in your "~/.vimrc":
 
 ```
-map <buffer> [^ <Plug>(PythonsenseStartOfPythonClass)
-map <buffer> ]^ <Plug>(PythonsenseEndOfPythonClass)
-map <buffer> ]$ <Plug>(PythonsenseStartOfNextPythonClass)
-map <buffer> [$ <Plug>(PythonsenseEndOfPreviousPythonClass)
-map <buffer> [f <Plug>(PythonsenseStartOfPythonFunction)
-map <buffer> ]F <Plug>(PythonsenseEndOfPythonFunction)
-map <buffer> ]f <Plug>(PythonsenseStartOfNextPythonFunction)
-map <buffer> [F <Plug>(PythonsenseEndOfPreviousPythonFunction)
+let g:is_pythonsense_suppress_motion_keymaps = 1
 ```
+
+If you want *both* the stock Vim 8.0+ motions, then you can also specify:
+
+```
+let g:is_pythonsense_alternate_motion_keymaps = 1
+```
+
+in your "~/.vimrc" to activate alternate mappings to the Pythonsense semantic motions that do not hide the the stock Vim 8.0+ motions.
+See [below](activating-alternative-motion-key-mappings) for more details.
 
 ### Python Location Information
 
@@ -183,8 +185,12 @@ or run:
 
 ## Customization
 
-If you are unhappy with the default key-mappings you define your own which will individually override the default ones.
-For example, to replicate the default mappings you would define the following in "~/.vim/ftplugin/python/pythonsense-custom.vim":
+### [Changing the Key Mappings](#changing-the-key-mappings)
+
+If you are unhappy with the default key-mappings you can define your own which will individually override the default ones.
+However, instead of doing so in your "~/.vimrc", you need to do so in a file located in your "~/.vim/ftplugin/python/" directory, so that this key mappings are only enabled when editing a Python file.
+Furthermore, you should make sure that you limit the key mapping to the "``<buffer>``" scope.
+For example, to override yet replicate the default mappings you would define, the following in "~/.vim/ftplugin/python/pythonsense-custom.vim":
 
 ```
 map <buffer> ac <Plug>(PythonsenseOuterClassTextObject)
@@ -206,6 +212,11 @@ map <buffer> [M <Plug>(PythonsenseEndOfPreviousPythonFunction)
 map <buffer> g: <Plug>(PythonsensePyWhere)
 ```
 
+Note that you do not need to specify *all* the key mappings if you just want to customize a few.
+Simply provide your own key mapping to each of the "``<Plug>``" mappings you want to override, and these will be respected, while any "``<Plug>``" maps that are not so explicitly bound will be assigned to the default key maps.
+
+### [Suppressing the Key Mappings](#suppressing-the-key-mappings)
+
 If you want to suppress some of the key mappings entirely (i.e., without providing your own to override the functionality), you can specify one or more of the following in your "~/.vimrc":
 
 ```
@@ -222,15 +233,27 @@ You can also suppress *all* default key mappings by specifying the following in 
 let g:is_pythonsense_suppress_keymaps = 1
 ```
 
-Note that if you just want to customize a few of the existing mappings (while keeping all the others), you do not need to suppress any key mappings: simply provide your own key mapping to each of the "``<Plug>``" mappings you want to override, and these will be respected, while any "``<Plug>``" maps that are not so explicitly bound will be assigned to the default key maps.
-So, for example, if you want to replace *just* the "``]m``", "``]M``", "``[m``", and "``[M``" default mappings with "``]f``", "``]F``", "``[f``", and "``[F``" respectively,you would specify the following in "~/.vim/ftplugin/python/pythonsense-custom.vim":
+### [Activating Alternative Motion Key Mappings](#activating-alternative-motion-key-mappings)
+
+As discussed above, "Pythonsense" overrides some native Vim 8.0+ motion key mappings, replacing the indent-based non-semantic ones with semantically-aware ones.
+If you wish to have access to both types of motions, i.e., the stock Vim 8.0+ non-semantic indent-based block motions as well as the "Pythonsense" semantically aware class/method/function motions, then you can specify
 
 ```
-map <buffer> ]f <Plug>(PythonsenseStartOfNextPythonFunction)
-map <buffer> ]F <Plug>(PythonsenseEndOfPythonFunction)
-map <buffer> [f <Plug>(PythonsenseStartOfPythonFunction)
-map <buffer> [F <Plug>(PythonsenseEndOfPreviousPythonFunction)
+let g:is_pythonsense_alternate_motion_keymaps = 1
 ```
+in your "~/.vimrc".
+
+Then (unless you specify you want all or motion key mappings suppressed entirely), the "Pythonsense" semantic class/method/function motions will be bound to the keys below:
+
+- "`]k`"  : Move (forward) to the beginning of the *next* Python class.
+- "`]K`"  : Move (forward) to the end of the *current* Python class.
+- "`[k`"  : Move (backward) to beginning of the *current* Python class (or beginning of the previous Python class if not currently in a class or already at the beginning of a class).
+- "`[K`"  : Move (backward) to end of the *previous* Python class.
+
+- "`]f`"  : Move (forward) to the beginning of the *next* Python method or function.
+- "`]F`"  : Move (forward) to the end of the *current* Python method or function.
+- "`[f`"  : Move (backward) to the beginning of the *current* Python method or function (or to the beginning of the previous method or function if not currently in a method/function or already at the beginning of a method/function).
+- "`[F`"  : Move (backward) to the end of the *previous* Python method or function.
 
 ## Similar Projects
 
