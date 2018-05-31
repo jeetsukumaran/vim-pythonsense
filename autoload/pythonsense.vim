@@ -63,7 +63,6 @@ endfunction
 let s:pythonsense_obj_start_line = -1
 let s:pythonsense_obj_end_line = -1
 function! pythonsense#select_named_object(obj_name, inner, range)
-
 	" Is this a new selection?
 	let new_vis = 0
 	let new_vis = new_vis || s:pythonsense_obj_start_line != a:range[0]
@@ -83,7 +82,7 @@ function! pythonsense#select_named_object(obj_name, inner, range)
         let scan_start_line -= 1
     endwhile
     if scan_start_line == 0
-        return 0
+        return [-1, -1]
     endif
     let obj_max_indent_level = -1
     while cnt > 0
@@ -91,7 +90,7 @@ function! pythonsense#select_named_object(obj_name, inner, range)
 
         let [obj_start_line, obj_end_line] = pythonsense#get_object_line_range(a:obj_name, obj_max_indent_level, current_line_nr, s:pythonsense_obj_end_line, a:inner)
         if obj_start_line == -1
-            return 0
+            return [-1, -1]
         endif
 
         let is_changed = 0
@@ -112,11 +111,11 @@ function! pythonsense#select_named_object(obj_name, inner, range)
             " no change to selection;
             " move to line above selection and try again
             if scan_start_line == 0
-                return 0
+                return [-1, -1]
             endif
             let [min_indent, max_indent] = pythonsense#get_minmax_indent_count('\(class\|def\)', scan_start_line, obj_end_line)
             if min_indent == 0
-                return 0
+                return [-1, -1]
             endif
             let obj_max_indent_level = min_indent - 1
             let scan_start_line -= 1
@@ -127,17 +126,12 @@ function! pythonsense#select_named_object(obj_name, inner, range)
     exec obj_start_line
     if obj_end_line >= obj_start_line
         execute "normal! V" . obj_end_line . "G"
-        if has("folding") && foldclosed(line('.')) != -1
-            " try
-            "     execute "normal! zO"
-            " catch /E490/ " no fold found
-            " endtry
-            execute "normal! zO"
-        endif
+        return [obj_start_line, obj_end_line]
     else
-        execute "normal VG"
+        execute "normal! VG"
+        return [-1, -1]
     endif
-    return 1
+
 endfunction
 
 function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line_range_start, line_range_end, inner)
@@ -156,19 +150,25 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
 
     " get end (w/ or w/out whitespace)
     let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, a:line_range_end, a:inner)
+
     if (a:inner)
         " find class/function body
-        call cursor(obj_start_line, 0)
-        let inner_start_line = search('):\(\s*$\|\s*#.*$\)', "Wce")
-        if inner_start_line
+        let inner_start_line = obj_start_line
+        while inner_start_line <= line('$')
+            if getline(inner_start_line) =~ '^.*[^#].*):\(\s*$\|\s*#.*$\)'
+                break
+            endif
+            let inner_start_line += 1
+        endwhile
+        if inner_start_line <= line('$')
             let obj_start_line = inner_start_line + 1
         endif
     else
         " include decorators
-        let dec_line = pythonsense#get_start_decorators_line_nr(obj_start_line)
-        if dec_line < obj_start_line
-            let obj_start_line = dec_line
-        endif
+        " let dec_line = pythonsense#get_start_decorators_line_nr(obj_start_line)
+        " if dec_line < obj_start_line
+        "     let obj_start_line = dec_line
+        " endif
     endif
 
     " This is an ugly hack to deal with (some) specially indented cases
@@ -214,14 +214,15 @@ endfunction
 function! pythonsense#get_start_decorators_line_nr(start)
     " Returns the line of the first decorator line above the starting line,
     " counting only decorators with the same level.
-    exec a:start
+    let lns = a:start
+    let current_line_indent = pythonsense#get_line_indent_count(lns)
     normal ^
-    let def_indent = indent(line("."))
-    normal k
-    while (indent(line(".") == def_indent) && getline(".") =~ '\v^\s*\@')
-        normal k
-    endwhile
-    return line(".") + 1
+    " let def_indent = indent(line("."))
+    " normal k
+    " while (indent(line(".") == def_indent) && getline(".") =~ '\v^\s*\@')
+    "     normal k
+    " endwhile
+    " return line(".") + 1
 endfunction
 
 function! pythonsense#get_line_indent_count(line_nr)
@@ -351,35 +352,34 @@ endfunction
 
 function! pythonsense#python_text_object(obj_name, inner, mode)
     if a:mode == "o"
-        let range = [line("."), line(".")]
+        let lnrange = [line("."), line(".")]
     else
-	    exe "normal! \<Esc>"
-        let range = [line("'<"), line("'>")]
-	    normal! gv
+        let lnrange = [line("'<"), line("'>")]
     endif
-    let nreps_left = v:count1
+    let nreps_left = 1 "v:count1
     while nreps_left > 0
-        let is_set = pythonsense#select_named_object(a:obj_name, a:inner, range)
-        if !is_set
+        let lnrange = pythonsense#select_named_object(a:obj_name, a:inner, lnrange)
+        execute "normal! \<ESC>gv"
+        if lnrange[0] == -1
             break
         endif
-	    exe "normal! \<Esc>"
-	    if nreps_left > 1
-            let range = [line("'<"), line("'>")]
-        else
-            " Update these static variables - we need to keep these up-to-date
-            " between invocations because it's the only way we can detect
-            " whether it's a new visual mode. We need to know if it's a new
-            " visual mode because otherwise if there's a single line block in
-            " visual line mode and we select it with "V", we can't tell
-            " whether it's already been selected using Vii.
-            let s:pythonsense_obj_start_line = line("'<")
-            let s:pythonsense_obj_end_line = line("'>")
-        endif
-	    normal! gv
+        let s:pythonsense_obj_start_line = lnrange[0]
+        let s:pythonsense_obj_end_line = lnrange[1]
         let nreps_left -= 1
     endwhile
-	exec "normal! \<ESC>gv"
+    if lnrange[0] != -1
+        exec "normal! \<ESC>gvo"
+        if has("folding") && foldclosed(line('.')) != -1
+            " try
+            "     execute "normal! zO"
+            " catch /E490/ " no fold found
+            " endtry
+            execute "normal! zO"
+        endif
+        " let s:pythonsense_obj_start_line = -1
+        " let s:pythonsense_obj_end_line = -1
+    endif
+    execute "normal! \<ESC>gv"
 endfunction
 
 function! pythonsense#python_function_text_object(inner, mode)
