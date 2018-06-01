@@ -467,32 +467,6 @@ endfunction
 
 " Python Movements {{{1
 
-function! pythonsense#find_start_line_for_end_movement(obj_name, initial_search_start_line, fwd, nreps_requested)
-    let start_line = a:initial_search_start_line
-    let nreps_remaining = a:nreps_requested
-    let target_pattern = '^\s*' . a:obj_name . '\s\+'
-    let scope_block_indent = -1
-    while start_line > 0
-        if getline(start_line) =~ '^\s*\(class\|def\)'
-            let current_line_indent = pythonsense#get_line_indent_count(start_line)
-            if getline(start_line) =~ target_pattern
-                if scope_block_indent == -1 || current_line_indent < scope_block_indent
-                    let nreps_remaining -= 1 " skip finding this block
-                    break
-                endif
-            endif
-            if scope_block_indent == -1 || current_line_indent < scope_block_indent
-                let scope_block_indent = current_line_indent
-            endif
-        endif
-        let start_line -= 1
-    endwhile
-    if !a:fwd
-        let start_line -= 1
-    endif
-    return [start_line, nreps_remaining]
-endfunction
-
 function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) range
     if a:fwd
         let initial_search_start_line = a:lastline
@@ -500,19 +474,12 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
         let initial_search_start_line = a:firstline
     endif
     if a:to_end
-        let [start_line, nreps_remaining] = pythonsense#find_start_line_for_end_movement(a:obj_name, initial_search_start_line, a:fwd, v:count1)
+        let target_line = pythonsense#move_to_end_of_python_object(a:obj_name, initial_search_start_line, a:fwd, v:count1)
     else
-        let nreps_remaining = v:count1
+        let target_line = pythonsense#move_to_start_of_python_object(a:obj_name, initial_search_start_line, a:fwd, v:count1)
     endif
-    if start_line <= 0
-        let start_line = 1
-    endif
-    let target_line = pythonsense#move_to_start_of_python_object(a:obj_name, start_line, a:fwd, a:vim_mode, nreps_remaining)
     if target_line < 0 || target_line > line('$')
         return
-    endif
-    if a:to_end
-        let target_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
     endif
     let current_column = col('.')
     let preserve_col_pos = get(b:, "pythonsense_preserve_col_pos", get(g:, "pythonsense_preserve_col_pos", 0))
@@ -535,7 +502,20 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
     endtry
 endfunction
 
-function! pythonsense#move_to_start_of_python_object(obj_name, start_line, fwd, vim_mode, nreps)
+function! pythonsense#move_to_end_of_python_object(obj_name, start_line, fwd, nreps)
+    let [start_line, nreps_remaining] = pythonsense#find_start_line_for_end_movement(a:obj_name, a:start_line, a:fwd, a:nreps)
+    if start_line <= 0
+        let start_line = 1
+    endif
+    let target_line = pythonsense#move_to_start_of_python_object(a:obj_name, start_line, a:fwd, nreps_remaining)
+    if target_line < 0 || target_line > line('$')
+        return -1
+    endif
+    let target_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
+    return target_line
+endfunction
+
+function! pythonsense#move_to_start_of_python_object(obj_name, start_line, fwd, nreps)
     let current_line = a:start_line
     if a:fwd
         let stepvalue = 1
@@ -564,6 +544,32 @@ function! pythonsense#move_to_start_of_python_object(obj_name, start_line, fwd, 
         let nreps_left -= 1
     endwhile
     return target_line
+endfunction
+
+function! pythonsense#find_start_line_for_end_movement(obj_name, initial_search_start_line, fwd, nreps_requested)
+    let start_line = a:initial_search_start_line
+    let nreps_remaining = a:nreps_requested
+    let target_pattern = '^\s*' . a:obj_name . '\s\+'
+    let scope_block_indent = -1
+    while start_line > 0
+        if getline(start_line) =~ '^\s*\(class\|def\)'
+            let current_line_indent = pythonsense#get_line_indent_count(start_line)
+            if getline(start_line) =~ target_pattern
+                if scope_block_indent == -1 || current_line_indent < scope_block_indent
+                    let nreps_remaining -= 1 " skip finding this block
+                    break
+                endif
+            endif
+            if scope_block_indent == -1 || current_line_indent < scope_block_indent
+                let scope_block_indent = current_line_indent
+            endif
+        endif
+        let start_line -= 1
+    endwhile
+    if !a:fwd
+        let start_line -= 1
+    endif
+    return [start_line, nreps_remaining]
 endfunction
 
 " }}}1
