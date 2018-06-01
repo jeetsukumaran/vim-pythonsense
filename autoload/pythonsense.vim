@@ -167,7 +167,6 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
         let obj_header_indent -= 1
     endif
 
-    " let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, effective_line_range_end, a:inner)
     let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, obj_start_line, a:inner)
 
     if (a:inner)
@@ -528,7 +527,13 @@ function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line,
             break
         endif
     endwhile
-    return target_line
+    if a:fwd && target_line < initial_search_start_line
+        return -1
+    elseif !a:fwd && target_line > initial_search_start_line
+        return -1
+    else
+        return target_line
+    endif
 endfunction
 
 function! pythonsense#find_start_of_python_object_to_move_to(obj_name, start_line, fwd, nreps)
@@ -567,12 +572,13 @@ function! pythonsense#find_start_line_for_end_movement(obj_name, initial_search_
     let nreps_remaining = a:nreps_requested
     let target_pattern = '^\s*' . a:obj_name . '\s\+'
     let scope_block_indent = -1
+    let is_found = 0
     while start_line > 0
         if getline(start_line) =~ '^\s*\(class\|def\)'
             let current_line_indent = pythonsense#get_line_indent_count(start_line)
             if getline(start_line) =~ target_pattern
                 if scope_block_indent == -1 || current_line_indent < scope_block_indent
-                    let nreps_remaining -= 1 " skip finding this block
+                    let is_found = 1
                     break
                 endif
             endif
@@ -582,8 +588,12 @@ function! pythonsense#find_start_line_for_end_movement(obj_name, initial_search_
         endif
         let start_line -= 1
     endwhile
-    if !a:fwd
-        let start_line -= 1
+    if is_found
+        if !a:fwd
+            let start_line -= 1
+        else
+            let nreps_remaining -= 1 " skip finding this block
+        endif
     endif
     return [start_line, nreps_remaining]
 endfunction
