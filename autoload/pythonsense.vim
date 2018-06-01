@@ -136,6 +136,15 @@ endfunction
 function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line_range_start, line_range_end, inner)
     " find definition line
     let current_line_nr = a:line_range_start
+    while current_line_nr <= a:line_range_end && current_line_nr <= line("$")
+        if getline(current_line_nr) !~ '^\s*@.*$'
+            break
+        end
+        let current_line_nr += 1
+    endwhile
+    if current_line_nr > a:line_range_end || current_line_nr > line("$")
+        return [-1, -1]
+    endif
     let obj_start_line = pythonsense#get_named_python_obj_start_line_nr(a:obj_name, a:obj_max_indent_level, current_line_nr, 0)
     " no object definition line in file
     if (! obj_start_line)
@@ -213,15 +222,22 @@ endfunction
 function! pythonsense#get_start_decorators_line_nr(start)
     " Returns the line of the first decorator line above the starting line,
     " counting only decorators with the same level.
-    let lns = a:start
-    let current_line_indent = pythonsense#get_line_indent_count(lns)
-    normal ^
-    " let def_indent = indent(line("."))
-    " normal k
-    " while (indent(line(".") == def_indent) && getline(".") =~# '\v^\s*\@')
-    "     normal k
-    " endwhile
-    " return line(".") + 1
+    let start_line_indent = pythonsense#get_line_indent_count(a:start)
+    let current_line = a:start - 1
+    let last_non_blank_line = current_line
+    while current_line > 0
+        if getline(current_line) !~ '^\s*$'
+            if pythonsense#get_line_indent_count(current_line) != start_line_indent
+                break
+            endif
+            if getline(current_line) !~ '^\s*@'
+                break
+            endif
+            let last_non_blank_line = current_line
+        endif
+        let current_line -= 1
+    endwhile
+    return last_non_blank_line
 endfunction
 
 function! pythonsense#get_line_indent_count(line_nr)
@@ -290,6 +306,7 @@ function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_inden
 
     let current_line = a:start_line
     while (current_line > 0 && current_line <= lastline)
+        " if getline(current_line) !~ '\(^\s*$\|^\s*[#@].*$\)'
         if getline(current_line) !~ '^\s*$'
             break
         endif
