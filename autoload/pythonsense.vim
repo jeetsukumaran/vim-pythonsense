@@ -510,16 +510,27 @@ function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line,
         if start_line <= 0
             let start_line = 1
         endif
-        let target_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, start_line, a:fwd, nreps_remaining)
-        if target_line < 0 || target_line > line('$')
+        let start_of_object_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, start_line, a:fwd, nreps_remaining)
+        if start_of_object_line < 0 || start_of_object_line > line('$')
             return -1
         endif
-        let target_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
-        if target_line > 0 && target_line == initial_search_start_line && niters == 0
+        let target_line = pythonsense#get_object_end_line_nr(start_of_object_line, start_of_object_line, 1)
+        if target_line > 0
+                    \ && niters == 0
+                    \ && (
+                    \   target_line == initial_search_start_line
+                    \   || (a:fwd && target_line < initial_search_start_line)
+                    \   || (!a:fwd && target_line > initial_search_start_line)
+                    \    )
             " no change; possibly because we are already at an end boundary;
             " make ONE more attempt at trying again
             let niters += 1
-            let effective_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, target_line, a:fwd, 1)
+            if a:fwd
+                let effective_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, target_line, a:fwd, 1)
+            else
+                let effective_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, start_of_object_line, a:fwd, 1)
+            endif
+            " echom "restarting at: " . effective_start_line . " from " . start_of_object_line . " (tl=" . target_line . ")"
             if effective_start_line <= 0
                 break
             endif
@@ -527,6 +538,7 @@ function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line,
             break
         endif
     endwhile
+    " echom niters . ": issl=" . initial_search_start_line . ", efs=" . effective_start_line . ", sl=" . start_line . ", sol=" . start_of_object_line . ", tl=" . target_line
     if a:fwd && target_line < initial_search_start_line
         return -1
     elseif !a:fwd && target_line > initial_search_start_line
