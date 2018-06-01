@@ -466,40 +466,48 @@ endfunction
 " }}}1
 
 " Python Movements {{{1
-function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) range
-    let nreps = v:count1
-    if a:fwd
-        let start_line = a:lastline
-    else
-        let start_line = a:firstline
-    endif
-    if a:to_end
-        " need to find top of current scope block
-        let target_pattern = '^\s*' . a:obj_name . '\s\+'
-        let scope_block_indent = -1
-        while start_line > 0
-            if getline(start_line) =~ '^\s*\(class\|def\)'
-                let current_line_indent = pythonsense#get_line_indent_count(start_line)
-                if getline(start_line) =~ target_pattern
-                    if scope_block_indent == -1 || current_line_indent < scope_block_indent
-                        let nreps -= 1 " skip finding this block
-                        break
-                    endif
-                endif
+
+function! pythonsense#find_start_line_for_end_movement(obj_name, initial_search_start_line, fwd, nreps_requested)
+    let start_line = a:initial_search_start_line
+    let nreps_remaining = a:nreps_requested
+    let target_pattern = '^\s*' . a:obj_name . '\s\+'
+    let scope_block_indent = -1
+    while start_line > 0
+        if getline(start_line) =~ '^\s*\(class\|def\)'
+            let current_line_indent = pythonsense#get_line_indent_count(start_line)
+            if getline(start_line) =~ target_pattern
                 if scope_block_indent == -1 || current_line_indent < scope_block_indent
-                    let scope_block_indent = current_line_indent
+                    let nreps_remaining -= 1 " skip finding this block
+                    break
                 endif
             endif
-            let start_line -= 1
-        endwhile
-        if !a:fwd
-            let start_line -= 1
+            if scope_block_indent == -1 || current_line_indent < scope_block_indent
+                let scope_block_indent = current_line_indent
+            endif
         endif
+        let start_line -= 1
+    endwhile
+    if !a:fwd
+        let start_line -= 1
+    endif
+    return [start_line, nreps_remaining]
+endfunction
+
+function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) range
+    if a:fwd
+        let initial_search_start_line = a:lastline
+    else
+        let initial_search_start_line = a:firstline
+    endif
+    if a:to_end
+        let [start_line, nreps_remaining] = pythonsense#find_start_line_for_end_movement(a:obj_name, initial_search_start_line, a:fwd, v:count1)
+    else
+        let nreps_remaining = v:count1
     endif
     if start_line <= 0
         let start_line = 1
     endif
-    let target_line = pythonsense#move_to_start_of_python_object(a:obj_name, start_line, a:fwd, a:vim_mode, nreps)
+    let target_line = pythonsense#move_to_start_of_python_object(a:obj_name, start_line, a:fwd, a:vim_mode, nreps_remaining)
     if target_line < 0 || target_line > line('$')
         return
     endif
