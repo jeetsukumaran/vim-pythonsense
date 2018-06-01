@@ -474,9 +474,9 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
         let initial_search_start_line = a:firstline
     endif
     if a:to_end
-        let target_line = pythonsense#move_to_end_of_python_object(a:obj_name, initial_search_start_line, a:fwd, v:count1)
+        let target_line = pythonsense#find_end_of_python_object_to_move_to(a:obj_name, initial_search_start_line, a:fwd, v:count1)
     else
-        let target_line = pythonsense#move_to_start_of_python_object(a:obj_name, initial_search_start_line, a:fwd, v:count1)
+        let target_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, initial_search_start_line, a:fwd, v:count1)
     endif
     if target_line < 0 || target_line > line('$')
         return
@@ -502,20 +502,36 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
     endtry
 endfunction
 
-function! pythonsense#move_to_end_of_python_object(obj_name, start_line, fwd, nreps)
-    let [start_line, nreps_remaining] = pythonsense#find_start_line_for_end_movement(a:obj_name, a:start_line, a:fwd, a:nreps)
-    if start_line <= 0
-        let start_line = 1
-    endif
-    let target_line = pythonsense#move_to_start_of_python_object(a:obj_name, start_line, a:fwd, nreps_remaining)
-    if target_line < 0 || target_line > line('$')
-        return -1
-    endif
-    let target_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
+function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line, fwd, nreps)
+    let initial_search_start_line = a:start_line
+    let effective_start_line = initial_search_start_line
+    let niters = 0
+    while niters < 2
+        let [start_line, nreps_remaining] = pythonsense#find_start_line_for_end_movement(a:obj_name, effective_start_line, a:fwd, a:nreps)
+        if start_line <= 0
+            let start_line = 1
+        endif
+        let target_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, start_line, a:fwd, nreps_remaining)
+        if target_line < 0 || target_line > line('$')
+            return -1
+        endif
+        let target_line = pythonsense#get_object_end_line_nr(target_line, target_line, 1)
+        if target_line > 0 && target_line == initial_search_start_line && niters == 0
+            " no change; possibly because we are already at an end boundary;
+            " make ONE more attempt at trying again
+            let niters += 1
+            let effective_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, target_line, a:fwd, 1)
+            if effective_start_line <= 0
+                break
+            endif
+        else
+            break
+        endif
+    endwhile
     return target_line
 endfunction
 
-function! pythonsense#move_to_start_of_python_object(obj_name, start_line, fwd, nreps)
+function! pythonsense#find_start_of_python_object_to_move_to(obj_name, start_line, fwd, nreps)
     let current_line = a:start_line
     if a:fwd
         let stepvalue = 1
