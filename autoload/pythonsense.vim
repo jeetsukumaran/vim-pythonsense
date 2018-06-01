@@ -184,10 +184,10 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
         endif
     else
         " include decorators
-        " let dec_line = pythonsense#get_start_decorators_line_nr(obj_start_line)
-        " if dec_line < obj_start_line
-        "     let obj_start_line = dec_line
-        " endif
+        let dec_line = pythonsense#get_start_decorators_line_nr(obj_start_line)
+        if dec_line < obj_start_line
+            let obj_start_line = dec_line
+        endif
     endif
 
     " This is an ugly hack to deal with (some) specially indented cases
