@@ -475,7 +475,7 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
     if a:to_end
         let target_line = pythonsense#find_end_of_python_object_to_move_to(a:obj_name, initial_search_start_line, a:fwd, v:count1)
     else
-        let target_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, initial_search_start_line, a:fwd, v:count1)
+        let target_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, initial_search_start_line, a:fwd, -1, v:count1)
     endif
     if target_line < 0 || target_line > line('$')
         return
@@ -510,7 +510,7 @@ function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line,
         if start_line <= 0
             let start_line = 1
         endif
-        let start_of_object_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, start_line, a:fwd, nreps_remaining)
+        let start_of_object_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, start_line, a:fwd, -1, nreps_remaining)
         if start_of_object_line < 0 || start_of_object_line > line('$')
             return -1
         endif
@@ -526,15 +526,22 @@ function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line,
             " make ONE more attempt at trying again
             let niters += 1
             if a:fwd
-                let effective_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, target_line, a:fwd, 1)
+                let effective_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, target_line, a:fwd, -1, 1)
                 if effective_start_line <= 0
                     break
                 endif
             else
-                let new_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, start_of_object_line, a:fwd, 1)
-                let new_start_line += 1
-                let start_of_object_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, new_start_line, a:fwd, nreps_remaining)
+                let prev_obj_indent = pythonsense#get_line_indent_count(start_of_object_line)
+                let [new_start_line, nreps_remaining] = pythonsense#find_start_line_for_end_movement(a:obj_name, start_of_object_line, a:fwd, a:nreps)
+                while new_start_line > 0 && getline(new_start_line) =~ '^\s*$'
+                    let new_start_line -= 1
+                endwhile
+                if new_start_line <= 0
+                    break
+                endif
+                let start_of_object_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, new_start_line, a:fwd, prev_obj_indent, nreps_remaining)
                 let target_line = pythonsense#get_object_end_line_nr(start_of_object_line, start_of_object_line, 1)
+                " echom new_start_line . ", " . start_of_object_line . ", " . target_line
                 break
             endif
         else
@@ -550,25 +557,34 @@ function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line,
     endif
 endfunction
 
-function! pythonsense#find_start_of_python_object_to_move_to(obj_name, start_line, fwd, nreps)
+function! pythonsense#find_start_of_python_object_to_move_to(obj_name, start_line, fwd, max_indent, nreps)
     let current_line = a:start_line
     if a:fwd
         let stepvalue = 1
     else
         let stepvalue = -1
     endif
-    let pattern = '^\s*' . a:obj_name . '\s\+'
+    let target_pattern = '^\s*' . a:obj_name . '\s\+'
     let nreps_left = a:nreps
     let start_line = current_line
     let target_line = current_line
-    if getline(start_line) =~# pattern
+    let scope_block_indent = a:max_indent
+    if getline(start_line) =~# target_pattern
         let start_line += stepvalue
     endif
     while nreps_left > 0
         while start_line > 0 && start_line <= line("$")
-            if getline(start_line) =~# pattern
-                let target_line = start_line
-                break
+            if getline(start_line) =~ '^\s*\(class\|def\)'
+                let current_line_indent = pythonsense#get_line_indent_count(start_line)
+                if getline(start_line) =~# target_pattern
+                    if a:max_indent < 0 || current_line_indent < scope_block_indent
+                        let target_line = start_line
+                        break
+                    endif
+                endif
+                if scope_block_indent == -1 || current_line_indent < scope_block_indent
+                    let scope_block_indent = current_line_indent
+                endif
             endif
             let start_line += stepvalue
         endwhile
