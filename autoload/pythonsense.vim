@@ -361,7 +361,7 @@ function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_inden
         " endif
 
         let target_line_indent = pythonsense#get_line_indent_count(current_line) - 1
-        if target_line_indent >= 0 && target_line_indent < max_indent
+        if target_line_indent > 0 && target_line_indent < max_indent
             let max_indent = target_line_indent
         endif
         if a:obj_max_indent_level > -1 && target_line_indent > a:obj_max_indent_level
@@ -474,27 +474,30 @@ function! pythonsense#move_to_python_object(obj_name, to_end, fwd, vim_mode) ran
         let start_line = a:firstline
     endif
     if a:to_end
-        let pattern = '^\s*' . a:obj_name . '\s\+'
-        if (a:fwd && getline(start_line) !=# pattern) || (!a:fwd && getline(start_line) =~# pattern)
-            " if !a:fwd && getline(start_line) =~# pattern
-            " endif
-            while start_line >= 0 && getline(start_line) !~# pattern
-                let start_line -= 1
-            endwhile
-            if start_line < 0
-                return
-            endif
-            let nreps -= 1
-        elseif (!a:fwd && getline(start_line) !~# pattern)
-            while start_line >= 0 && getline(start_line) !~# pattern
-                let start_line -= 1
-            endwhile
-            if start_line < 0
-                return
-            " elseif start_line == 0
+        " need to find top of current scope block
+        let target_pattern = '^\s*' . a:obj_name . '\s\+'
+        let scope_block_indent = -1
+        while start_line > 0
+            if getline(start_line) =~ '^\s*\(class\|def\)'
+                let current_line_indent = pythonsense#get_line_indent_count(start_line)
+                if getline(start_line) =~ target_pattern
+                    if scope_block_indent == -1 || current_line_indent < scope_block_indent
+                        let nreps -= 1 " skip finding this block
+                        break
+                    endif
+                endif
+                if scope_block_indent == -1 || current_line_indent < scope_block_indent
+                    let scope_block_indent = current_line_indent
+                endif
             endif
             let start_line -= 1
+        endwhile
+        if !a:fwd
+            let start_line -= 1
         endif
+    endif
+    if start_line <= 0
+        let start_line = 1
     endif
     let target_line = pythonsense#move_to_start_of_python_object(a:obj_name, start_line, a:fwd, a:vim_mode, nreps)
     if target_line < 0 || target_line > line('$')
@@ -539,14 +542,14 @@ function! pythonsense#move_to_start_of_python_object(obj_name, start_line, fwd, 
         let start_line += stepvalue
     endif
     while nreps_left > 0
-        while start_line >= 0 && start_line <= line("$")
+        while start_line > 0 && start_line <= line("$")
             if getline(start_line) =~# pattern
                 let target_line = start_line
                 break
             endif
             let start_line += stepvalue
         endwhile
-        if start_line < 0 || start_line > line("$")
+        if start_line < 1 || start_line > line("$")
             break
         endif
         let start_line += stepvalue
