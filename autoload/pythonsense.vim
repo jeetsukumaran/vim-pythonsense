@@ -167,8 +167,8 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
         let obj_header_indent -= 1
     endif
 
-    " get end (w/ or w/out whitespace)
-    let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, effective_line_range_end, a:inner)
+    " let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, effective_line_range_end, a:inner)
+    let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, obj_start_line, a:inner)
 
     if (a:inner)
         " find class/function body
@@ -234,8 +234,8 @@ function! pythonsense#get_start_decorators_line_nr(start)
     " Returns the line of the first decorator line above the starting line,
     " counting only decorators with the same level.
     let start_line_indent = pythonsense#get_line_indent_count(a:start)
+    let last_non_blank_line = a:start
     let current_line = a:start - 1
-    let last_non_blank_line = current_line
     while current_line > 0
         if getline(current_line) !~ '^\s*$'
             if pythonsense#get_line_indent_count(current_line) != start_line_indent
