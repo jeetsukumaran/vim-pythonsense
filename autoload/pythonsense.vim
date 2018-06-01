@@ -136,14 +136,25 @@ endfunction
 function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line_range_start, line_range_end, inner)
     " find definition line
     let current_line_nr = a:line_range_start
-    while current_line_nr <= a:line_range_end && current_line_nr <= line("$")
+    if a:line_range_start == a:line_range_end
+        let search_past_decorator_last_line = line("$")
+    else
+        let search_past_decorator_last_line = a:line_range_end
+    endif
+
+    while current_line_nr <= search_past_decorator_last_line
         if getline(current_line_nr) !~ '^\s*@.*$'
             break
         end
         let current_line_nr += 1
     endwhile
-    if current_line_nr > a:line_range_end || current_line_nr > line("$")
+    if current_line_nr > search_past_decorator_last_line
         return [-1, -1]
+    endif
+    if current_line_nr > a:line_range_end
+        let effective_line_range_end = current_line_nr
+    else
+        let effective_line_range_end = a:line_range_end
     endif
     let obj_start_line = pythonsense#get_named_python_obj_start_line_nr(a:obj_name, a:obj_max_indent_level, current_line_nr, 0)
     " no object definition line in file
@@ -157,7 +168,7 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
     endif
 
     " get end (w/ or w/out whitespace)
-    let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, a:line_range_end, a:inner)
+    let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, effective_line_range_end, a:inner)
 
     if (a:inner)
         " find class/function body
