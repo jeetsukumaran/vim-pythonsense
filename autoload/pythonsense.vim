@@ -528,7 +528,11 @@ function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line,
             if a:fwd
                 let effective_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, target_line, a:fwd, 1)
             else
-                let effective_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, start_of_object_line, a:fwd, 1)
+                let new_start_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, start_of_object_line, a:fwd, 1)
+                let new_start_line += 1
+                let start_of_object_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, new_start_line, a:fwd, nreps_remaining)
+                let target_line = pythonsense#get_object_end_line_nr(start_of_object_line, start_of_object_line, 1)
+                break
             endif
             " echom "restarting at: " . effective_start_line . " from " . start_of_object_line . " (tl=" . target_line . ")"
             if effective_start_line <= 0
