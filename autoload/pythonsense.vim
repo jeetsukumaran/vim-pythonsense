@@ -174,7 +174,7 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
         " find class/function body
         let inner_start_line = obj_start_line
         while inner_start_line <= line('$')
-            if getline(inner_start_line) =~# '^[^#]*):\(\s*$\|\s*#.*$\)'
+            if getline(inner_start_line) =~# '^[^#]*)[^#]*:\(\s*$\|\s*#.*$\)'
                 break
             endif
             let inner_start_line += 1
