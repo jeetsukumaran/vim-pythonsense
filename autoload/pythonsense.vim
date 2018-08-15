@@ -63,16 +63,17 @@ endfunction
 let s:pythonsense_obj_start_line = -1
 let s:pythonsense_obj_end_line = -1
 function! pythonsense#select_named_object(obj_name, inner, range)
-	" Is this a new selection?
-	let new_vis = 0
-	let new_vis = new_vis || s:pythonsense_obj_start_line != a:range[0]
-	let new_vis = new_vis || s:pythonsense_obj_end_line != a:range[1]
+    echom 'New select named object'
+    " Is this a new selection?
+    let new_vis = 0
+    let new_vis = new_vis || s:pythonsense_obj_start_line != a:range[0]
+    let new_vis = new_vis || s:pythonsense_obj_end_line != a:range[1]
 
     " store current range
-	let s:pythonsense_obj_start_line = a:range[0]
-	let s:pythonsense_obj_end_line = a:range[1]
+    let s:pythonsense_obj_start_line = a:range[0]
+    let s:pythonsense_obj_end_line = a:range[1]
 
-	" Repeatedly increase the scope of the selection.
+    " Repeatedly increase the scope of the selection.
     let cnt = 1
     let scan_start_line = s:pythonsense_obj_start_line
     while scan_start_line > 0
@@ -173,7 +174,7 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
         " find class/function body
         let inner_start_line = obj_start_line
         while inner_start_line <= line('$')
-            if getline(inner_start_line) =~# '^.*[^#].*):\(\s*$\|\s*#.*$\)'
+            if getline(inner_start_line) =~# '^[^#]*):\(\s*$\|\s*#.*$\)'
                 break
             endif
             let inner_start_line += 1
@@ -219,6 +220,13 @@ endfunction
 
 function! pythonsense#get_next_indent_line_nr(search_start, obj_indent)
     let line = a:search_start
+
+    let saved_cursor = getcurpos()
+    call cursor(line, 0)
+    normal f(%
+    let line = line('.')
+    call setpos('.', saved_cursor)
+
     let lastline = line('$')
     while (line > 0 && line <= lastline)
         let line = line + 1
