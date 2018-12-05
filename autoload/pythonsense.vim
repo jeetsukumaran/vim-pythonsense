@@ -368,7 +368,11 @@ function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_inden
         " endif
 
         let target_line_indent = pythonsense#get_line_indent_count(current_line) - 1
-        if target_line_indent > 0 && target_line_indent < max_indent
+        " Special case for multiline argument lines, with the parameter being
+        " indented one step more than the open def/class and the closing
+        " parenthesis.
+        let closing_pattern = '^' . indent_char . '*)'
+        if target_line_indent > 0 && target_line_indent < max_indent && getline(current_line) !~# closing_pattern
             let max_indent = target_line_indent
         endif
         if a:obj_max_indent_level > -1 && target_line_indent > a:obj_max_indent_level
@@ -549,7 +553,6 @@ function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line,
                 endif
                 let start_of_object_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, new_start_line, a:fwd, prev_obj_indent, nreps_remaining)
                 let target_line = pythonsense#get_object_end_line_nr(start_of_object_line, start_of_object_line, 1)
-                " echom new_start_line . ", " . start_of_object_line . ", " . target_line
                 break
             endif
         else
