@@ -223,7 +223,7 @@ function! pythonsense#get_next_indent_line_nr(search_start, obj_indent)
 
     let saved_cursor = getcurpos()
     call cursor(line, 0)
-    normal f(%
+    normal! f(%
     let line = line('.')
     call setpos('.', saved_cursor)
 
