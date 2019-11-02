@@ -113,7 +113,7 @@ function! pythonsense#select_named_object(obj_name, inner, range)
             if scan_start_line == 0
                 return [-1, -1]
             endif
-            let [min_indent, max_indent] = pythonsense#get_minmax_indent_count('\(class\|def\)', scan_start_line, obj_end_line)
+            let [min_indent, max_indent] = pythonsense#get_minmax_indent_count('\(class\|def\|async def\)', scan_start_line, obj_end_line)
             if min_indent == 0
                 return [-1, -1]
             endif
@@ -196,7 +196,7 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
     " Make sure there is no statement line with a lower indentation than the
     " definition line in between the current line and the definition line
     if a:obj_name == 'class'
-        let pattern = 'def'
+        let pattern = 'def\|async def'
     else
         let pattern = 'class'
     endif
@@ -323,9 +323,9 @@ function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_inden
         let current_line = current_line + stepvalue
     endwhile
     if a:obj_max_indent_level > -1
-        let pattern = '^' . indent_char . '\{0,' . a:obj_max_indent_level . '}' . '\(class\|def\)'
+        let pattern = '^' . indent_char . '\{0,' . a:obj_max_indent_level . '}' . '\(class\|def\|async def\)'
     else
-        let pattern = '^\s*' . '\(class\|def\)'
+        let pattern = '^\s*' . '\(class\|def\|async def\)'
     endif
     if getline(current_line) =~# pattern
         if getline(current_line) =~# a:obj_name
@@ -342,7 +342,7 @@ function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_inden
     endif
     let max_indent = target_line_indent
     while (current_line > 0 && current_line <= lastline)
-        let pattern = '^' . indent_char . '\{0,' . max_indent . '}' . '\(class\|def\)'
+        let pattern = '^' . indent_char . '\{0,' . max_indent . '}' . '\(class\|def\|async def\)'
         if getline(current_line) =~# pattern
             if getline(current_line) =~# a:obj_name
                 return current_line
@@ -418,13 +418,13 @@ function! pythonsense#python_docstring_text_object (inner)
     " get current line number
     let s = line('.')
     " climb up to first def/class line, or first line of buffer
-    while s > 0 && getline(s) !~# '^\s*\(def\|class\)'
+    while s > 0 && getline(s) !~# '^\s*\(def\|async def\|class\)'
         let s = s - 1
     endwhile
     " set search start to just after def/class line, or on first buffer line
     let s = s + 1
     " descend lines obj_end_line end of buffer or def/class line
-    while s < line('$') && getline(s) !~# '^\s*\(def\|class\)'
+    while s < line('$') && getline(s) !~# '^\s*\(def\|async def\|class\)'
         " if line begins with optional whitespace followed by '''
         if getline(s) =~ "^\\s*'''" || getline(s) =~ '^\s*"""'
             if getline(s) =~ "^\\s*'''"
@@ -435,7 +435,7 @@ function! pythonsense#python_docstring_text_object (inner)
             " set search end to just after found start line
             let e = s + 1
             " descend lines obj_end_line end of buffer or def/class line
-            while e <= line('$') && getline(e) !~# '^\s*\(def\|class\)'
+            while e <= line('$') && getline(e) !~# '^\s*\(def\|async def\|class\)'
                 " if line ends with ''' followed by optional whitespace
                 if getline(e) =~ close_pattern
                     " TODO check first for blank lines above to select instead
@@ -574,7 +574,7 @@ function! pythonsense#find_start_of_python_object_to_move_to(obj_name, start_lin
     endif
     while nreps_left > 0
         while start_line > 0 && start_line <= line("$")
-            if getline(start_line) =~ '^\s*\(class\|def\)'
+            if getline(start_line) =~ '^\s*\(class\|def\|async def\)'
                 let current_line_indent = pythonsense#get_line_indent_count(start_line)
                 if getline(start_line) =~# target_pattern
                     if a:max_indent < 0 || current_line_indent < scope_block_indent
@@ -604,7 +604,7 @@ function! pythonsense#find_start_line_for_end_movement(obj_name, initial_search_
     let scope_block_indent = -1
     let is_found = 0
     while start_line > 0
-        if getline(start_line) =~ '^\s*\(class\|def\)'
+        if getline(start_line) =~ '^\s*\(class\|def\|async def\)'
             let current_line_indent = pythonsense#get_line_indent_count(start_line)
             if getline(start_line) =~ target_pattern
                 if scope_block_indent == -1 || current_line_indent < scope_block_indent
@@ -635,7 +635,7 @@ function! pythonsense#echo_python_location()
     let indent_char = pythonsense#get_indent_char()
     let pyloc = []
     let current_line = line('.')
-    let obj_pattern = '\(class\|def\)'
+    let obj_pattern = '\(class\|def\|async def\)'
     while current_line > 0
         if getline(current_line) !~ '^\s*$'
             break
@@ -654,9 +654,9 @@ function! pythonsense#echo_python_location()
         let pattern = '^' . indent_char . '\{0,' . target_line_indent . '}' . obj_pattern
         let current_line_text = getline(current_line)
         if current_line_text =~# pattern
-            let obj_name = matchstr(current_line_text, '^\s*\(class\|def\)\s\+\zs\k\+')
+            let obj_name = matchstr(current_line_text, '^\s*\(class\|def\|async def\)\s\+\zs\k\+')
             if get(g:, "pythonsense_extended_location_info", 1)
-                let obj_type = matchstr(current_line_text, '^\s*\zs\(class\|def\)')
+                let obj_type = matchstr(current_line_text, '^\s*\zs\(class\|def\|async def\)')
                 call add(pyloc, "(" . obj_type . ":)" . obj_name)
             else
                 call add(pyloc, obj_name)
