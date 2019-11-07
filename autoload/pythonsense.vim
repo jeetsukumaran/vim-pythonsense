@@ -63,7 +63,6 @@ endfunction
 let s:pythonsense_obj_start_line = -1
 let s:pythonsense_obj_end_line = -1
 function! pythonsense#select_named_object(obj_name, inner, range)
-    echom 'New select named object'
     " Is this a new selection?
     let new_vis = 0
     let new_vis = new_vis || s:pythonsense_obj_start_line != a:range[0]
@@ -86,6 +85,7 @@ function! pythonsense#select_named_object(obj_name, inner, range)
         return [-1, -1]
     endif
     let obj_max_indent_level = -1
+
     while cnt > 0
         let current_line_nr = scan_start_line
 
@@ -170,11 +170,18 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
 
     let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, obj_start_line, a:inner)
 
+    " in case of a class definition, the parentheses are optional
+    if a:obj_name == "def"
+      let pattern = '^[^#]*)[^#]*:\(\s*$\|\s*#.*$\)'
+    else
+      let pattern = '^[^#]*)\?[^#]*:\(\s*$\|\s*#.*$\)'
+    endif
+
     if (a:inner)
         " find class/function body
         let inner_start_line = obj_start_line
         while inner_start_line <= line('$')
-            if getline(inner_start_line) =~# '^[^#]*)[^#]*:\(\s*$\|\s*#.*$\)'
+            if getline(inner_start_line) =~# pattern
                 break
             endif
             let inner_start_line += 1
@@ -221,6 +228,9 @@ endfunction
 function! pythonsense#get_next_indent_line_nr(search_start, obj_indent)
     let line = a:search_start
 
+    echom "obj " . a:obj_indent . " line " . line
+
+    " Handle multiline definition 
     let saved_cursor = getcurpos()
     call cursor(line, 0)
     normal! f(%
