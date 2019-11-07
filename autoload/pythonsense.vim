@@ -228,8 +228,6 @@ endfunction
 function! pythonsense#get_next_indent_line_nr(search_start, obj_indent)
     let line = a:search_start
 
-    echom "obj " . a:obj_indent . " line " . line
-
     " Handle multiline definition 
     let saved_cursor = getcurpos()
     call cursor(line, 0)
