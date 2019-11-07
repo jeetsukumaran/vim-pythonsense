@@ -63,16 +63,16 @@ endfunction
 let s:pythonsense_obj_start_line = -1
 let s:pythonsense_obj_end_line = -1
 function! pythonsense#select_named_object(obj_name, inner, range)
-	" Is this a new selection?
-	let new_vis = 0
-	let new_vis = new_vis || s:pythonsense_obj_start_line != a:range[0]
-	let new_vis = new_vis || s:pythonsense_obj_end_line != a:range[1]
+    " Is this a new selection?
+    let new_vis = 0
+    let new_vis = new_vis || s:pythonsense_obj_start_line != a:range[0]
+    let new_vis = new_vis || s:pythonsense_obj_end_line != a:range[1]
 
     " store current range
-	let s:pythonsense_obj_start_line = a:range[0]
-	let s:pythonsense_obj_end_line = a:range[1]
+    let s:pythonsense_obj_start_line = a:range[0]
+    let s:pythonsense_obj_end_line = a:range[1]
 
-	" Repeatedly increase the scope of the selection.
+    " Repeatedly increase the scope of the selection.
     let cnt = 1
     let scan_start_line = s:pythonsense_obj_start_line
     while scan_start_line > 0
@@ -85,6 +85,7 @@ function! pythonsense#select_named_object(obj_name, inner, range)
         return [-1, -1]
     endif
     let obj_max_indent_level = -1
+
     while cnt > 0
         let current_line_nr = scan_start_line
 
@@ -169,11 +170,18 @@ function! pythonsense#get_object_line_range(obj_name, obj_max_indent_level, line
 
     let obj_end_line = pythonsense#get_object_end_line_nr(obj_start_line, obj_start_line, a:inner)
 
+    " in case of a class definition, the parentheses are optional
+    if a:obj_name == "def"
+      let pattern = '^[^#]*)[^#]*:\(\s*$\|\s*#.*$\)'
+    else
+      let pattern = '^[^#]*)\?[^#]*:\(\s*$\|\s*#.*$\)'
+    endif
+
     if (a:inner)
         " find class/function body
         let inner_start_line = obj_start_line
         while inner_start_line <= line('$')
-            if getline(inner_start_line) =~# '^.*[^#].*):\(\s*$\|\s*#.*$\)'
+            if getline(inner_start_line) =~# pattern
                 break
             endif
             let inner_start_line += 1
@@ -219,6 +227,16 @@ endfunction
 
 function! pythonsense#get_next_indent_line_nr(search_start, obj_indent)
     let line = a:search_start
+
+    echom "obj " . a:obj_indent . " line " . line
+
+    " Handle multiline definition 
+    let saved_cursor = getcurpos()
+    call cursor(line, 0)
+    normal! f(%
+    let line = line('.')
+    call setpos('.', saved_cursor)
+
     let lastline = line('$')
     while (line > 0 && line <= lastline)
         let line = line + 1
@@ -360,7 +378,11 @@ function! pythonsense#get_named_python_obj_start_line_nr(obj_name, obj_max_inden
         " endif
 
         let target_line_indent = pythonsense#get_line_indent_count(current_line) - 1
-        if target_line_indent > 0 && target_line_indent < max_indent
+        " Special case for multiline argument lines, with the parameter being
+        " indented one step more than the open def/class and the closing
+        " parenthesis.
+        let closing_pattern = '^' . indent_char . '*)'
+        if target_line_indent > 0 && target_line_indent < max_indent && getline(current_line) !~# closing_pattern
             let max_indent = target_line_indent
         endif
         if a:obj_max_indent_level > -1 && target_line_indent > a:obj_max_indent_level
@@ -541,7 +563,6 @@ function! pythonsense#find_end_of_python_object_to_move_to(obj_name, start_line,
                 endif
                 let start_of_object_line = pythonsense#find_start_of_python_object_to_move_to(a:obj_name, new_start_line, a:fwd, prev_obj_indent, nreps_remaining)
                 let target_line = pythonsense#get_object_end_line_nr(start_of_object_line, start_of_object_line, 1)
-                " echom new_start_line . ", " . start_of_object_line . ", " . target_line
                 break
             endif
         else
