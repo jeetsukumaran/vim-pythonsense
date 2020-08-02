@@ -95,36 +95,36 @@ nnoremap <buffer> <silent> <Plug>(PythonsensePyWhere) :Pywhere<CR>
 if ! get(g:, "is_pythonsense_suppress_keymaps", 0) && ! get(g:, "is_pythonsense_suppress_object_keymaps", 0)
 
     if !hasmapto('<Plug>PythonsenseOuterClassTextObject')
-        vmap ac <Plug>(PythonsenseOuterClassTextObject)
-        omap ac <Plug>(PythonsenseOuterClassTextObject)
-        sunmap ac
+        vmap <buffer> ac <Plug>(PythonsenseOuterClassTextObject)
+        omap <buffer> ac <Plug>(PythonsenseOuterClassTextObject)
+        sunmap <buffer> ac
     endif
     if !hasmapto('<Plug>PythonsenseInnerClassTextObject')
-        vmap ic <Plug>(PythonsenseInnerClassTextObject)
-        omap ic <Plug>(PythonsenseInnerClassTextObject)
-        sunmap ic
+        vmap <buffer> ic <Plug>(PythonsenseInnerClassTextObject)
+        omap <buffer> ic <Plug>(PythonsenseInnerClassTextObject)
+        sunmap <buffer> ic
     endif
 
     if !hasmapto('<Plug>PythonsenseOuterFunctionTextObject')
-        vmap af <Plug>(PythonsenseOuterFunctionTextObject)
-        omap af <Plug>(PythonsenseOuterFunctionTextObject)
-        sunmap af
+        vmap <buffer> af <Plug>(PythonsenseOuterFunctionTextObject)
+        omap <buffer> af <Plug>(PythonsenseOuterFunctionTextObject)
+        sunmap <buffer> af
     endif
     if !hasmapto('<Plug>PythonsenseInnerFunctionTextObject')
-        vmap if <Plug>(PythonsenseInnerFunctionTextObject)
-        omap if <Plug>(PythonsenseInnerFunctionTextObject)
-        sunmap if
+        vmap <buffer> if <Plug>(PythonsenseInnerFunctionTextObject)
+        omap <buffer> if <Plug>(PythonsenseInnerFunctionTextObject)
+        sunmap <buffer> if
     endif
 
     if !hasmapto('<Plug>PythonsenseOuterDocStringTextObject')
-        omap ad <Plug>(PythonsenseOuterDocStringTextObject)
-        vmap ad <Plug>(PythonsenseOuterDocStringTextObject)
-        sunmap ad
+        omap <buffer> ad <Plug>(PythonsenseOuterDocStringTextObject)
+        vmap <buffer> ad <Plug>(PythonsenseOuterDocStringTextObject)
+        sunmap <buffer> ad
     endif
     if !hasmapto('<Plug>PythonsenseInnerDocStringTextObject')
-        omap id <Plug>(PythonsenseInnerDocStringTextObject)
-        vmap id <Plug>(PythonsenseInnerDocStringTextObject)
-        sunmap id
+        omap <buffer> id <Plug>(PythonsenseInnerDocStringTextObject)
+        vmap <buffer> id <Plug>(PythonsenseInnerDocStringTextObject)
+        sunmap <buffer> id
     endif
 endif
 
